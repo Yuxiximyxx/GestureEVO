@@ -1066,6 +1066,13 @@
     <string name="package_activity_label">%1$s\n%2$s</string>
     <string name="contact_result_label">%1$s – %2$s</string>
     <string name="app_shortcut_result_label">%1$s：%2$s</string>
+    <string name="recent_apps_settings_title">最近使用应用</string>
+    <string name="recent_apps_settings_description">快捷搜索底部行的显示设置</string>
+    <string name="recent_apps_settings_show_label">显示名称</string>
+    <string name="recent_apps_settings_column_count_title">每行显示数量</string>
+    <string name="recent_apps_settings_column_count_description">底部行一行显示的应用个数</string>
+    <string name="recent_apps_settings_icon_size_title">图标大小</string>
+    <string name="recent_apps_settings_icon_size_description">单位为 dp，可在 36 到 64 之间调整</string>
     <string name="guide_title">设置引导</string>
     <string name="guide_entry_summary">一站式快速配置触发区、基础手势与快捷轮盘（推荐新用户使用）</string>
     <string name="guide_progress">核心设置已就绪 %1$d / %2$d</string>

@@ -57,6 +57,8 @@ class SearchEngineManager(
     private var enginePager: QuickSearchEnginePager? = null
     private var recentApps: List<APPModel> = emptyList()
     private val recentAppsAdapter = RecentAppsAdapter()
+    private var recentColumnCount = 5
+    private var recentItemWidthPx = 0
     private var showImageBadge = true
     private var bottomInputLayoutEnabled = false
     private val iconBindings = WeakHashMap<RoundImageTextView, Any>()
@@ -109,10 +111,42 @@ class SearchEngineManager(
         // The bottom card row now shows recently used apps instead of the
         // search engine list; the pager stays hidden in the quick search UI.
         binding.enginePager.isVisible = false
+        val recentShowLabel = preferences.readKey(
+            SearchEngineSettingsActivity.KEY_RECENT_SHOW_LABEL,
+            true
+        )
+        recentColumnCount = preferences.readKey(
+            SearchEngineSettingsActivity.KEY_RECENT_COLUMN_COUNT,
+            5
+        ).coerceIn(
+            SearchEngineSettingsActivity.MIN_COLUMN_COUNT,
+            SearchEngineSettingsActivity.MAX_COLUMN_COUNT
+        )
+        val recentIconSizeDp = preferences.readKey(
+            SearchEngineSettingsActivity.KEY_RECENT_ICON_SIZE,
+            48
+        ).coerceIn(
+            SearchEngineSettingsActivity.MIN_RECENT_ICON_SIZE,
+            SearchEngineSettingsActivity.MAX_RECENT_ICON_SIZE
+        )
+        recentAppsAdapter.configure(
+            showLabel = recentShowLabel,
+            iconSizePx = (recentIconSizeDp * activity.resources.displayMetrics.density).toInt()
+        )
         binding.recentAppsRow.apply {
             layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             adapter = recentAppsAdapter
             isNestedScrollingEnabled = false
+            addOnLayoutChangeListener { view, left, _, right, _, _, _, _, _ ->
+                val contentWidth = (right - left) - view.paddingStart - view.paddingEnd
+                if (contentWidth > 0 && recentColumnCount > 0) {
+                    val itemWidth = contentWidth / recentColumnCount
+                    if (itemWidth != recentItemWidthPx) {
+                        recentItemWidthPx = itemWidth
+                        recentAppsAdapter.setItemWidth(itemWidth)
+                    }
+                }
+            }
         }
     }
 
@@ -233,9 +267,24 @@ class SearchEngineManager(
     private inner class RecentAppsAdapter : RecyclerView.Adapter<RecentAppsAdapter.Holder>() {
 
         private var items: List<APPModel> = emptyList()
+        private var showLabel = true
+        private var iconSizePx = 0
+        private var itemWidthPx = 0
 
         fun submit(list: List<APPModel>) {
             items = list
+            notifyDataSetChanged()
+        }
+
+        fun configure(showLabel: Boolean, iconSizePx: Int) {
+            if (this.showLabel == showLabel && this.iconSizePx == iconSizePx) return
+            this.showLabel = showLabel
+            this.iconSizePx = iconSizePx
+            notifyDataSetChanged()
+        }
+
+        fun setItemWidth(px: Int) {
+            itemWidthPx = px
             notifyDataSetChanged()
         }
 
@@ -257,8 +306,24 @@ class SearchEngineManager(
         ) : RecyclerView.ViewHolder(itemBinding.root) {
 
             fun bind(app: APPModel) {
+                if (itemWidthPx > 0) {
+                    val rootParams = itemBinding.root.layoutParams
+                    if (rootParams.width != itemWidthPx) {
+                        rootParams.width = itemWidthPx
+                        itemBinding.root.layoutParams = rootParams
+                    }
+                }
                 itemBinding.recentAppLabel.text = app.name
+                itemBinding.recentAppLabel.isVisible = showLabel
                 val iconView = itemBinding.recentAppIcon
+                if (iconSizePx > 0) {
+                    val iconParams = iconView.layoutParams
+                    if (iconParams.width != iconSizePx || iconParams.height != iconSizePx) {
+                        iconParams.width = iconSizePx
+                        iconParams.height = iconSizePx
+                        iconView.layoutParams = iconParams
+                    }
+                }
                 iconView.applyGlobalImageRoundPercent = true
                 iconView.setText(app.name)
                 val token = Any()

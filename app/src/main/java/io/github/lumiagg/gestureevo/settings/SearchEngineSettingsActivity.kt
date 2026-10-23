@@ -41,6 +41,8 @@ class SearchEngineSettingsActivity : AppCompatActivity() {
     private var defaultEngineTag: String? = null
     private var engineColumnCount = 5
     private var engineRowCount = 1 // Default row count
+    private var recentColumnCount = 5
+    private var recentIconSize = 48
     private var showImageBadge = true
 
     companion object {
@@ -62,6 +64,12 @@ class SearchEngineSettingsActivity : AppCompatActivity() {
         const val MAX_ROW_COUNT = 5
         const val MIN_COLUMN_COUNT = 2
         const val MAX_COLUMN_COUNT = 8
+        const val KEY_RECENT_SHOW_LABEL = "recent_apps_show_label"
+        const val KEY_RECENT_COLUMN_COUNT = "recent_apps_column_count"
+        const val KEY_RECENT_ICON_SIZE = "recent_apps_icon_size"
+        const val MIN_RECENT_ICON_SIZE = 36
+        const val MAX_RECENT_ICON_SIZE = 64
+        const val RECENT_ICON_SIZE_STEP = 4
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,6 +195,70 @@ class SearchEngineSettingsActivity : AppCompatActivity() {
                 }
             }
         }
+
+        // Recent apps row (quick search bottom row) display options
+        binding.recentLabelVisibilitySwitch.isChecked =
+            settingsStore.readKey(KEY_RECENT_SHOW_LABEL, true)
+        binding.recentLabelVisibilitySwitch.setOnCheckedChangeListener { _, isChecked ->
+            lifecycleScope.launch {
+                settingsStore.saveKey(KEY_RECENT_SHOW_LABEL, isChecked)
+            }
+        }
+
+        recentColumnCount = settingsStore.readKey(KEY_RECENT_COLUMN_COUNT, 5)
+            .coerceIn(MIN_COLUMN_COUNT, MAX_COLUMN_COUNT)
+        recentIconSize = settingsStore.readKey(KEY_RECENT_ICON_SIZE, 48)
+            .coerceIn(MIN_RECENT_ICON_SIZE, MAX_RECENT_ICON_SIZE)
+        updateRecentAppsDisplay()
+
+        binding.btnDecreaseRecentColumns.setOnClickListener {
+            if (recentColumnCount > MIN_COLUMN_COUNT) {
+                lifecycleScope.launch {
+                    recentColumnCount -= 1
+                    settingsStore.saveKey(KEY_RECENT_COLUMN_COUNT, recentColumnCount)
+                    updateRecentAppsDisplay()
+                }
+            }
+        }
+
+        binding.btnIncreaseRecentColumns.setOnClickListener {
+            if (recentColumnCount < MAX_COLUMN_COUNT) {
+                lifecycleScope.launch {
+                    recentColumnCount += 1
+                    settingsStore.saveKey(KEY_RECENT_COLUMN_COUNT, recentColumnCount)
+                    updateRecentAppsDisplay()
+                }
+            }
+        }
+
+        binding.btnDecreaseRecentIconSize.setOnClickListener {
+            if (recentIconSize > MIN_RECENT_ICON_SIZE) {
+                lifecycleScope.launch {
+                    recentIconSize -= RECENT_ICON_SIZE_STEP
+                    settingsStore.saveKey(KEY_RECENT_ICON_SIZE, recentIconSize)
+                    updateRecentAppsDisplay()
+                }
+            }
+        }
+
+        binding.btnIncreaseRecentIconSize.setOnClickListener {
+            if (recentIconSize < MAX_RECENT_ICON_SIZE) {
+                lifecycleScope.launch {
+                    recentIconSize += RECENT_ICON_SIZE_STEP
+                    settingsStore.saveKey(KEY_RECENT_ICON_SIZE, recentIconSize)
+                    updateRecentAppsDisplay()
+                }
+            }
+        }
+    }
+
+    private fun updateRecentAppsDisplay() {
+        binding.tvRecentColumnCount.text = getString(R.string.display_integer, recentColumnCount)
+        binding.tvRecentIconSize.text = getString(R.string.display_integer, recentIconSize)
+        binding.btnDecreaseRecentColumns.isEnabled = recentColumnCount > MIN_COLUMN_COUNT
+        binding.btnIncreaseRecentColumns.isEnabled = recentColumnCount < MAX_COLUMN_COUNT
+        binding.btnDecreaseRecentIconSize.isEnabled = recentIconSize > MIN_RECENT_ICON_SIZE
+        binding.btnIncreaseRecentIconSize.isEnabled = recentIconSize < MAX_RECENT_ICON_SIZE
     }
 
     private fun openPreviewSortMode() {
