@@ -6,24 +6,34 @@ import android.content.Context
 import android.net.Uri
 import android.os.SystemClock
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.datastore.preferences.core.Preferences
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import io.github.lumiagg.gestureevo.R
 import io.github.lumiagg.gestureevo.databinding.ActivityQuickSearchBinding
+import io.github.lumiagg.gestureevo.databinding.RecentAppItemBinding
+import io.github.lumiagg.gestureevo.db.APPModel
+import io.github.lumiagg.gestureevo.gesture.config.GestureActionType
 import io.github.lumiagg.gestureevo.gesture.config.IconType
 import io.github.lumiagg.gestureevo.gesture.ui.RoundImageTextView
 import io.github.lumiagg.gestureevo.search.config.EngineType
 import io.github.lumiagg.gestureevo.search.config.SearchEngine
 import io.github.lumiagg.gestureevo.search.config.SearchEngineDataManager
 import io.github.lumiagg.gestureevo.settings.SearchEngineSettingsActivity
+import io.github.lumiagg.gestureevo.utils.ActionProxy
 import io.github.lumiagg.gestureevo.utils.ClipboardUtils
+import io.github.lumiagg.gestureevo.utils.RecentAppsRecorder
 import io.github.lumiagg.gestureevo.utils.ToastHelper
+import io.github.lumiagg.gestureevo.utils.uriBuilder
 import io.github.lumiagg.gestureevo.utils.icon.IconHelper
 import io.github.lumiagg.gestureevo.utils.readKey
 import io.github.lumiagg.gestureevo.utils.settingsStore
@@ -45,6 +55,8 @@ class SearchEngineManager(
     private var currentSearchEngine: SearchEngine? = null
     private val searchEngines = mutableListOf<SearchEngine>()
     private var enginePager: QuickSearchEnginePager? = null
+    private var recentApps: List<APPModel> = emptyList()
+    private val recentAppsAdapter = RecentAppsAdapter()
     private var showImageBadge = true
     private var bottomInputLayoutEnabled = false
     private val iconBindings = WeakHashMap<RoundImageTextView, Any>()
@@ -71,9 +83,8 @@ class SearchEngineManager(
         searchEngines.addAll(engines)
         currentSearchEngine = engines.find { it.tag == defaultEngineTag } ?: engines.firstOrNull()
         engineDataLoaded = true
-        updateSearchEngineCardVisibility()
         updateSearchEngineIcon()
-        enginePager?.submitList(searchEngines)
+        loadRecentApps()
         pendingSearch?.let { (query, freeform) ->
             pendingSearch = null
             performSearchByCurrentEngine(query, freeform)
@@ -90,38 +101,18 @@ class SearchEngineManager(
             SearchEngineSettingsActivity.KEY_BOTTOM_INPUT_LAYOUT,
             false
         )
-        val showEngineLabel = preferences.readKey(
-            SearchEngineSettingsActivity.KEY_ENGINE_SHOW_LABEL,
-            true
-        )
         showImageBadge = preferences.readKey(
             SearchEngineSettingsActivity.KEY_SHOW_IMAGE_BADGE,
             true
         )
-        val previewSortMode = activity.intent.getBooleanExtra("previewSortMode", false)
-        val engineLineCount =
-            preferences.readKey(SearchEngineSettingsActivity.KEY_ROW_COUNT, 1)
-                .coerceIn(SearchEngineSettingsActivity.MIN_ROW_COUNT, SearchEngineSettingsActivity.MAX_ROW_COUNT)
-        val engineColumnCount =
-            preferences.readKey(SearchEngineSettingsActivity.KEY_COLUMN_COUNT, 5)
-                .coerceIn(SearchEngineSettingsActivity.MIN_COLUMN_COUNT, SearchEngineSettingsActivity.MAX_COLUMN_COUNT)
 
-        enginePager = binding.enginePager.apply {
-            setIconLoader { view, engine, badge -> loadEngineIcon(view, engine, badge) }
-            configure(
-                QuickSearchEnginePager.Config(
-                    rowCount = engineLineCount,
-                    columnCount = engineColumnCount,
-                    showLabel = showEngineLabel,
-                    showImageBadge = showImageBadge,
-                    previewSortMode = previewSortMode
-                )
-            )
-            setCallbacks(
-                onEngineClick = { engine -> clickSearchEngine(engine, false) },
-                onEngineLongClick = { engine -> clickSearchEngine(engine, true) },
-                onOrderChanged = { orderedEngines -> saveSearchEngineOrder(orderedEngines) }
-            )
+        // The bottom card row now shows recently used apps instead of the
+        // search engine list; the pager stays hidden in the quick search UI.
+        binding.enginePager.isVisible = false
+        binding.recentAppsRow.apply {
+            layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = recentAppsAdapter
+            isNestedScrollingEnabled = false
         }
     }
 
@@ -175,11 +166,11 @@ class SearchEngineManager(
     }
 
     private suspend fun updateSearchEngineCardVisibility() {
-        val hasSearchEngines = searchEngines.isNotEmpty()
-        binding.engineIcon.isVisible = hasSearchEngines
+        binding.engineIcon.isVisible = searchEngines.isNotEmpty()
+        val hasRecentApps = recentApps.isNotEmpty()
         val card = binding.bottomEngineCard
         val initialHeight = card.height
-        if (!hasSearchEngines && bottomInputLayoutEnabled && card.isVisible && initialHeight > 0) {
+        if (!hasRecentApps && bottomInputLayoutEnabled && card.isVisible && initialHeight > 0) {
             // An empty list is only known after IO. Collapse its reserved space
             // smoothly rather than snapping the whole combined card to a new height.
             val params = card.layoutParams
@@ -200,7 +191,95 @@ class SearchEngineManager(
                 card.layoutParams = params
             }
         } else {
-            card.isVisible = hasSearchEngines
+            card.isVisible = hasRecentApps
+        }
+    }
+
+    fun hasRecentApps(): Boolean = recentApps.isNotEmpty()
+
+    private fun loadRecentApps() {
+        lifecycleScope.launch(uiDispatcher) {
+            val recents = withContext(ioDispatcher) {
+                try {
+                    RecentAppsRecorder.getRecentApps(RECENT_APPS_LIMIT)
+                        .filter { it.lastUsageTime > 0 && !it.isRemove }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.w("SearchEngineManager", "Unable to load recent apps", e)
+                    emptyList()
+                }
+            }
+            recentApps = recents
+            recentAppsAdapter.submit(recents)
+            updateSearchEngineCardVisibility()
+        }
+    }
+
+    private fun openRecentApp(app: APPModel) {
+        lifecycleScope.launch(uiDispatcher) {
+            val link = uriBuilder(GestureActionType.OPEN_APP)
+                .appendQueryParameter("pkg", app.pkgName)
+                .appendQueryParameter("freeform", false.toString())
+                .apply {
+                    activity.triggerSide?.let { appendQueryParameter("triggerSide", it) }
+                }
+                .build()
+            ActionProxy(activity, link.toString()).execute(side = activity.triggerSide)
+            activity.finishWithAnimation()
+        }
+    }
+
+    private inner class RecentAppsAdapter : RecyclerView.Adapter<RecentAppsAdapter.Holder>() {
+
+        private var items: List<APPModel> = emptyList()
+
+        fun submit(list: List<APPModel>) {
+            items = list
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+            val itemBinding = RecentAppItemBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
+            return Holder(itemBinding)
+        }
+
+        override fun getItemCount(): Int = items.size
+
+        override fun onBindViewHolder(holder: Holder, position: Int) {
+            holder.bind(items[position])
+        }
+
+        inner class Holder(
+            private val itemBinding: RecentAppItemBinding
+        ) : RecyclerView.ViewHolder(itemBinding.root) {
+
+            fun bind(app: APPModel) {
+                itemBinding.recentAppLabel.text = app.name
+                val iconView = itemBinding.recentAppIcon
+                iconView.applyGlobalImageRoundPercent = true
+                iconView.setText(app.name)
+                val token = Any()
+                iconBindings[iconView] = token
+                lifecycleScope.launch(uiDispatcher) {
+                    val icon = try {
+                        withContext(ioDispatcher) {
+                            IconHelper.getIcon(activity.applicationContext, app.pkgName)
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        null
+                    }
+                    if (icon != null && iconBindings[iconView] === token) {
+                        iconView.setImage(icon)
+                        iconView.clearTint()
+                    }
+                }
+                itemBinding.root.setOnClickListener { openRecentApp(app) }
+            }
         }
     }
 
@@ -322,6 +401,10 @@ class SearchEngineManager(
     fun getCurrentSearchEngine(): SearchEngine? = currentSearchEngine
 
     fun getSearchEngines(): List<SearchEngine> = searchEngines.toList()
+
+    private companion object {
+        const val RECENT_APPS_LIMIT = 12
+    }
 }
 
 fun setEngineIcon(

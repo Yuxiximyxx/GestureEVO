@@ -499,9 +499,9 @@ class QuickSearchActivity : AppCompatActivity() {
         val isLandscape = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
         if (!bottomInputLayoutEnabled) {
             val shouldShow = if (isLandscape) {
-                text.isEmpty() && engineManager.getSearchEngines().isNotEmpty()
+                text.isEmpty() && engineManager.hasRecentApps()
             } else {
-                engineManager.getSearchEngines().isNotEmpty()
+                engineManager.hasRecentApps()
             }
             if (binding.bottomEngineCard.isVisible != shouldShow) {
                 binding.bottomEngineCard.isVisible = shouldShow

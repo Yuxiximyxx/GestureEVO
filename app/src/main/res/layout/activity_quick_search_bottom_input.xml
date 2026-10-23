@@ -169,7 +169,16 @@
             android:paddingHorizontal="4dp"
             android:paddingTop="2dp"
             android:paddingBottom="8dp"
+            android:visibility="gone"
             tools:itemCount="5" />
+          <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recent_apps_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:paddingHorizontal="4dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="8dp" />
         </LinearLayout>
       </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
