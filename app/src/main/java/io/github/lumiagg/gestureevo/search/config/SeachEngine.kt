@@ -115,6 +115,13 @@ sealed class SearchResult {
 
     data class ShortcutResult(val shortcut: ShortcutModel) : SearchResult()
 
+    data class AppShortcutResult(
+        val appName: String,
+        val packageName: String,
+        val shortcutName: String,
+        val targetUri: String
+    ) : SearchResult()
+
     data class HistoryResult(val text: String) : SearchResult()
 
     data object ClearHistoryAction : SearchResult()

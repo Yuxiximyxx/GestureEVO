@@ -242,6 +242,7 @@ class SearchResultManager(
             }
             addType<SearchResult.AppResult>(resultItemLayout)
             addType<SearchResult.ShortcutResult>(resultItemLayout)
+            addType<SearchResult.AppShortcutResult>(resultItemLayout)
             addType<SearchResult.ContactResult>(resultItemLayout)
             addType<SearchResult.HistoryResult>(resultItemLayout)
             addType<SearchResult.ClearHistoryAction>(resultItemLayout)
@@ -260,6 +261,7 @@ class SearchResultManager(
                     is SearchResult.AppResult -> bindAppResult(itemView, model)
                     is SearchResult.ContactResult -> bindContactResult(itemView, model)
                     is SearchResult.ShortcutResult -> bindShortcutResult(itemView, model)
+                    is SearchResult.AppShortcutResult -> bindAppShortcutResult(itemView, model)
                     is SearchResult.HistoryResult -> bindHistoryResult(itemView, model)
                     is SearchResult.ClearHistoryAction -> bindClearHistoryAction(itemView)
                     is SearchResult.UrlResult -> bindUrlResult(itemView, model)
@@ -289,6 +291,7 @@ class SearchResultManager(
                 when (val result = getModel<SearchResult>()) {
                     is SearchResult.AppResult -> openApp(result.app, false)
                     is SearchResult.ShortcutResult -> openShortcut(result.shortcut, false)
+                    is SearchResult.AppShortcutResult -> openAppShortcut(result)
                     is SearchResult.ContactResult -> callContact(activity, result.contact)
                     is SearchResult.HistoryResult -> clickText(result.text)
                     is SearchResult.ClearHistoryAction -> confirmClearAllHistory()
@@ -339,6 +342,20 @@ class SearchResultManager(
         itemBinding.icon.applyGlobalImageRoundPercent = true
         bindBuiltInResultIcon(itemBinding.icon, R.drawable.baseline_settings_24)
         loadResultImage(itemView, { IconHelper.getIcon(activity, "com.android.settings") }) { icon ->
+            itemBinding.icon.applyGlobalImageRoundPercent = true
+            itemBinding.icon.setImage(icon)
+            itemBinding.icon.clearTint()
+        }
+    }
+
+    private fun bindAppShortcutResult(itemView: View, model: SearchResult.AppShortcutResult) {
+        val itemBinding = SearchResultItemBinding.bind(itemView)
+        itemBinding.resultText.text =
+            activity.getString(R.string.app_shortcut_result_label, model.appName, model.shortcutName)
+        applyResultTextStyle(itemBinding.resultText, isUrl = false)
+        itemBinding.icon.applyGlobalImageRoundPercent = true
+        bindBuiltInResultIcon(itemBinding.icon, R.drawable.baseline_image_24)
+        loadResultImage(itemView, { IconHelper.getIcon(activity, model.packageName) }) { icon ->
             itemBinding.icon.applyGlobalImageRoundPercent = true
             itemBinding.icon.setImage(icon)
             itemBinding.icon.clearTint()
@@ -761,6 +778,8 @@ class SearchResultManager(
         is SearchResult.AppResult -> "app:${result.app.pkgName}:${result.app.userId}"
         is SearchResult.ShortcutResult ->
             "shortcut:${result.shortcut.id}:${result.shortcut.name}:${result.shortcut.uri}"
+        is SearchResult.AppShortcutResult ->
+            "app_shortcut:${result.packageName}:${result.shortcutName}:${result.targetUri}"
         is SearchResult.ContactResult -> "contact:${result.contact.phoneNumber}:${result.contact.name}"
         is SearchResult.HistoryResult -> "history:${result.text}"
         is SearchResult.UrlResult -> "url:${result.url}"
@@ -819,10 +838,12 @@ class SearchResultManager(
         return coroutineScope {
             val historyDeferred = async { filterHistory(normalizedQuery) }
             val appDeferred = async { filterApps(normalizedQuery) }
+            val appShortcutDeferred = async { filterAppShortcuts(normalizedQuery) }
             val shortcutDeferred = async { filterShortcuts(normalizedQuery) }
             val contactDeferred = async { filterContacts(normalizedQuery) }
 
             appDeferred.await() +
+                    appShortcutDeferred.await() +
                     shortcutDeferred.await() +
                     contactDeferred.await() +
                     historyDeferred.await()
@@ -834,6 +855,7 @@ class SearchResultManager(
         when (first) {
             is SearchResult.AppResult -> openApp(first.app, false)
             is SearchResult.ShortcutResult -> openShortcut(first.shortcut, false)
+            is SearchResult.AppShortcutResult -> openAppShortcut(first)
             is SearchResult.ContactResult -> callContact(activity, first.contact)
             is SearchResult.HistoryResult -> {
                 if (first.text == binding.searchInput.text?.toString().orEmpty()) return false
@@ -1004,6 +1026,15 @@ class SearchResultManager(
         }
     }
 
+    private suspend fun filterAppShortcuts(query: String): List<SearchResult.AppShortcutResult> {
+        return try {
+            AppShortcutSearchHelper.search(activity.applicationContext, query)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
     private suspend fun filterHistory(query: String): List<SearchResult> {
         if (!searchHistoryEnabled) return emptyList()
         return withContext(ioDispatcher) {
@@ -1031,6 +1062,20 @@ class SearchResultManager(
             val link = uriBuilder(GestureActionType.OTHER_LINK)
                 .appendQueryParameter("uri", model.uri)
                 .appendQueryParameter("freeform", freeform.toString())
+                .apply {
+                    activity.triggerSide?.let { appendQueryParameter("triggerSide", it) }
+                }
+                .build()
+            ActionProxy(activity, link.toString()).execute(side = activity.triggerSide)
+            activity.finishWithAnimation()
+        }
+    }
+
+    private fun openAppShortcut(model: SearchResult.AppShortcutResult) {
+        lifecycleScope.launch(uiDispatcher) {
+            val link = uriBuilder(GestureActionType.OTHER_LINK)
+                .appendQueryParameter("uri", model.targetUri)
+                .appendQueryParameter("freeform", false.toString())
                 .apply {
                     activity.triggerSide?.let { appendQueryParameter("triggerSide", it) }
                 }

@@ -1065,6 +1065,7 @@
     <string name="app_activity_label">%1$s · %2$s</string>
     <string name="package_activity_label">%1$s\n%2$s</string>
     <string name="contact_result_label">%1$s – %2$s</string>
+    <string name="app_shortcut_result_label">%1$s：%2$s</string>
     <string name="guide_title">设置引导</string>
     <string name="guide_entry_summary">一站式快速配置触发区、基础手势与快捷轮盘（推荐新用户使用）</string>
     <string name="guide_progress">核心设置已就绪 %1$d / %2$d</string>

@@ -11,6 +11,8 @@ internal fun SearchResult.hiddenRecord(context: Context): HiddenSearchResultMode
         is SearchResult.AppResult -> app.name
         is SearchResult.ContactResult -> "${contact.name} - ${contact.phoneNumber}"
         is SearchResult.ShortcutResult -> shortcut.name
+        is SearchResult.AppShortcutResult ->
+            context.getString(R.string.app_shortcut_result_label, appName, shortcutName)
         is SearchResult.HistoryResult -> text
         is SearchResult.UrlResult -> url
         is SearchResult.PhoneResult -> phone
@@ -51,6 +53,7 @@ internal fun HiddenSearchResultModel.typeLabelRes(): Int = when (resultKey.subst
     "app" -> R.string.hidden_search_type_app
     "contact" -> R.string.hidden_search_type_contact
     "shortcut" -> R.string.hidden_search_type_shortcut
+    "app_shortcut" -> R.string.hidden_search_type_shortcut
     "history" -> R.string.hidden_search_type_history
     "url" -> R.string.hidden_search_type_url
     "phone" -> R.string.hidden_search_type_phone

@@ -40,7 +40,12 @@ private suspend fun syncAppCatalogUnlocked(context: Context) = withContext(Dispa
     database.withTransaction {
         val dao = database.appDao
         val known = dao.getAll()
-        val plan = planAppCatalogSync(installedApps.keys, known.map { CatalogPackage(it.pkgName, it.isRemove) })
+        // Only packages actually installed for this user count as present;
+        // MATCH_UNINSTALLED_PACKAGES also returns removed packages whose data was kept.
+        val installedPackageNames = installedApps.values
+            .filter { it.flags and ApplicationInfo.FLAG_INSTALLED != 0 }
+            .mapTo(HashSet()) { it.packageName }
+        val plan = planAppCatalogSync(installedPackageNames, known.map { CatalogPackage(it.pkgName, it.isRemove) })
         val changes = plan.added.map { packageName ->
             val info = installedApps.getValue(packageName)
             APPModel(appDisplayName(context, info) ?: packageName, packageName).apply {

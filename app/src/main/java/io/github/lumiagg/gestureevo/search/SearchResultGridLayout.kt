@@ -83,6 +83,10 @@ internal class SearchResultGridLayout(
             is SearchResult.PhoneResult -> !fitsOneLine(result.phone, textWidth)
             is SearchResult.AppResult -> !fitsTwoLines(result.app.name, textWidth)
             is SearchResult.ShortcutResult -> !fitsTwoLines(result.shortcut.name, textWidth)
+            is SearchResult.AppShortcutResult -> !fitsTwoLines(
+                context.getString(R.string.app_shortcut_result_label, result.appName, result.shortcutName),
+                textWidth
+            )
             is SearchResult.GestureActionResult -> !fitsTwoLines(result.actionType.showName(context), textWidth)
             is SearchResult.AppSettingsResult -> !fitsTwoLines(context.getString(R.string.quick_search_app_settings), textWidth)
             else -> true

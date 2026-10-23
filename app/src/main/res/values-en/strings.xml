@@ -1062,6 +1062,7 @@
     <string name="app_activity_label">%1$s · %2$s</string>
     <string name="package_activity_label">%1$s\n%2$s</string>
     <string name="contact_result_label">%1$s – %2$s</string>
+    <string name="app_shortcut_result_label">%1$s: %2$s</string>
     <string name="guide_title">Setup guide</string>
     <string name="guide_entry_summary">All-in-one setup for trigger area, basic gestures and quick wheel (recommended for new users)</string>
     <string name="guide_progress">%1$d / %2$d essentials ready</string>

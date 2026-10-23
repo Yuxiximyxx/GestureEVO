@@ -7,6 +7,7 @@ internal fun SearchResult.pinKey(): String? = when (this) {
     is SearchResult.AppResult -> "app:${app.userId}:${app.pkgName}"
     is SearchResult.ContactResult -> "contact:${contact.contactId}:${contact.phoneNumber}"
     is SearchResult.ShortcutResult -> shortcut.uri?.takeIf { it.isNotBlank() }?.let { "shortcut:$it" }
+    is SearchResult.AppShortcutResult -> "app_shortcut:$packageName:$targetUri"
     is SearchResult.HistoryResult -> "history:$text"
     is SearchResult.UrlResult -> "url:$url"
     is SearchResult.PhoneResult -> "phone:$phone"
