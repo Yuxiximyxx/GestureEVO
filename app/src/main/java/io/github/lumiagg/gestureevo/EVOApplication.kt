@@ -1,9 +1,11 @@
 package io.github.lumiagg.gestureevo
 
 import io.github.lumiagg.gestureevo.diagnostics.AppLogger
+import android.app.Activity
 import android.app.Application
 import android.content.ComponentCallbacks2
 import android.content.res.Configuration
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import io.github.lumiagg.gestureevo.settings.AppearanceSettingsActivity
@@ -20,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import io.github.lumiagg.gestureevo.utils.app.syncAppCatalogIfNeeded
+import io.github.lumiagg.gestureevo.utils.NavigationImmersion
 import io.github.lumiagg.gestureevo.search.SettingsShortcutSearchHelper
 
 
@@ -49,6 +52,23 @@ class EvoApplication : Application() {
         DynamicColorUtils.applyAppWideColors(this)
         // Settings views read the shared palette while inflating, before any service starts.
         DynamicColorUtils.refreshSurfaceColors(this)
+        // Global navigation-bar immersion: every Activity gets a transparent
+        // navigation bar with content extending underneath it (layouts keep
+        // their fitsSystemWindows insets handling, so interactive content
+        // stays above the bar). QuickSearchActivity is excluded by the
+        // helper itself because it toggles decor fitting on its own.
+        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+                NavigationImmersion.apply(activity)
+            }
+
+            override fun onActivityStarted(activity: Activity) {}
+            override fun onActivityResumed(activity: Activity) {}
+            override fun onActivityPaused(activity: Activity) {}
+            override fun onActivityStopped(activity: Activity) {}
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+            override fun onActivityDestroyed(activity: Activity) {}
+        })
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
