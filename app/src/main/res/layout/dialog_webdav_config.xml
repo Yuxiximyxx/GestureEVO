@@ -63,13 +63,13 @@
     android:orientation="horizontal">
     <Button
       android:id="@+id/cancelButton"
-      style="@style/Widget.Material3.Button.TextButton"
+      style="@style/Widget.GestureEVO.Button.TextSecondary"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="@string/webdav_config_cancel" />
     <Button
       android:id="@+id/testButton"
-      style="@style/Widget.Material3.Button.TextButton"
+      style="@style/Widget.GestureEVO.Button.TextSecondary"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:visibility="gone"
@@ -79,6 +79,6 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="@string/webdav_config_save"
-      style="@style/Widget.Material3.Button.TextButton" />
+      style="@style/Widget.GestureEVO.Button.TextPrimary" />
   </LinearLayout>
 </LinearLayout>

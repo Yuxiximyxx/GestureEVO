@@ -83,13 +83,16 @@ class FreeTriggerConfigActivity : AppCompatActivity() {
 
     private fun applySystemBarInsets() {
         val initialPaddingTop = binding.root.paddingTop
+        val initialPaddingBottom = binding.root.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(
                 view.paddingLeft,
                 initialPaddingTop + systemBars.top,
                 view.paddingRight,
-                view.paddingBottom
+                // Round 2: also keep the form's bottom end clear of the
+                // immersive (transparent) navigation bar.
+                initialPaddingBottom + systemBars.bottom
             )
             insets
         }

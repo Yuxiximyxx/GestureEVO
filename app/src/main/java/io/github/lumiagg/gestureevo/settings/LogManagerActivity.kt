@@ -83,7 +83,7 @@ class LogManagerActivity : AppCompatActivity() {
         timeIndex = savedInstanceState?.getInt("time") ?: 0
         pendingArchive = savedInstanceState?.getString("archive")?.let(::File)
         selectedSession = ProblemSessions.history.value.firstOrNull { it.id == savedInstanceState?.getString("session") }
-        binding.toolbar.setNavigationIcon(androidx.appcompat.R.drawable.abc_ic_ab_back_material)
+        binding.toolbar.setNavigationIcon(io.github.lumiagg.gestureevo.R.drawable.ic_miuix_back)
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding.logList.adapter = ConcatAdapter(FixedViewAdapter(header.root), adapter, FixedViewAdapter(footer.root))
         binding.toolbar.menu.add(0, MENU_EXPORT, 0, R.string.log_export).apply {

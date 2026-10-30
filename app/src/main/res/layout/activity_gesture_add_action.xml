@@ -4,10 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/miuix_page_bg"
     android:fitsSystemWindows="true">
 
     <androidx.core.widget.NestedScrollView
         style="@style/Widget.Material3.BottomSheet"
+        android:background="@drawable/bg_miuix_sheet_top"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
@@ -42,7 +44,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/subWheelButton"
-                style="@style/Widget.Material3.Button.TextButton"
+                style="@style/Widget.GestureEVO.Button.TextPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/gesture_add_action_sub_wheel"

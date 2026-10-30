@@ -5,7 +5,7 @@
     android:layout_width="100dp"
     android:layout_height="100dp"
     android:layout_margin="5dp"
-    app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+    app:cardBackgroundColor="@color/miuix_card"
     app:cardCornerRadius="15dp"
     app:cardElevation="0dp">
 

@@ -53,4 +53,101 @@
         <item name="haloColor">@color/miuix_divider</item>
     </style>
 
+    <!-- ===== Round 2: dialogs, bottom sheets, popups, buttons (app-wide) ===== -->
+
+    <!-- Dialog container shape: 24dp rounded corners on every side. -->
+    <style name="ShapeAppearance.GestureEVO.Dialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">24dp</item>
+    </style>
+
+    <!-- Bottom-sheet shape: 24dp rounded top corners, square bottom. -->
+    <style name="ShapeAppearance.GestureEVO.BottomSheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">24dp</item>
+        <item name="cornerSizeTopRight">24dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <!-- Modal bottom sheet surface in MIUIX form. Behavior attributes stay
+         with the Material default / the Scrollable catalog style. -->
+    <style name="Widget.GestureEVO.BottomSheet.Modal" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="shapeAppearance">@style/ShapeAppearance.GestureEVO.BottomSheet</item>
+        <item name="backgroundTint">@color/miuix_card</item>
+    </style>
+
+    <!-- Dialog buttons: primary (positive) in the accent blue, secondary
+         (negative/neutral) in secondary gray. -->
+    <style name="Widget.GestureEVO.DialogButton.Primary" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/miuix_accent</item>
+    </style>
+
+    <style name="Widget.GestureEVO.DialogButton.Secondary" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/miuix_text_secondary</item>
+    </style>
+
+    <!-- MaterialAlertDialog (66 call sites) in MIUIX form: miuix card surface,
+         24dp shape, miuix text colors, differentiated dialog buttons. -->
+    <style name="ThemeOverlay.GestureEVO.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/miuix_card</item>
+        <item name="colorOnSurface">@color/miuix_text_primary</item>
+        <item name="colorPrimary">@color/miuix_accent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.GestureEVO.Dialog</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/TextAppearance.GestureEVO.MiuixDialogTitle</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/TextAppearance.GestureEVO.MiuixDialogBody</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.GestureEVO.DialogButton.Primary</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.GestureEVO.DialogButton.Secondary</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.GestureEVO.DialogButton.Secondary</item>
+    </style>
+
+    <!-- AppCompat AlertDialog (a couple of call sites) gets the same buttons. -->
+    <style name="ThemeOverlay.GestureEVO.AlertDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="colorPrimary">@color/miuix_accent</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.GestureEVO.DialogButton.Primary</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.GestureEVO.DialogButton.Secondary</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.GestureEVO.DialogButton.Secondary</item>
+    </style>
+
+    <!-- Bottom-sheet dialogs app-wide in MIUIX form. -->
+    <style name="ThemeOverlay.GestureEVO.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.GestureEVO.BottomSheet.Modal</item>
+        <item name="colorSurface">@color/miuix_card</item>
+    </style>
+
+    <style name="TextAppearance.GestureEVO.MiuixDialogTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/miuix_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.GestureEVO.MiuixDialogBody" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/miuix_text_primary</item>
+    </style>
+
+    <!-- Standalone buttons in MIUIX form (used by custom dialog/page layouts). -->
+    <style name="Widget.GestureEVO.Button.Primary" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/miuix_accent</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="cornerRadius">20dp</item>
+    </style>
+
+    <style name="Widget.GestureEVO.Button.TextPrimary" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/miuix_accent</item>
+    </style>
+
+    <style name="Widget.GestureEVO.Button.TextSecondary" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/miuix_text_secondary</item>
+    </style>
+
+    <!-- Popup menus / list popup windows surface. -->
+    <style name="Widget.GestureEVO.ListPopupWindow" parent="Widget.AppCompat.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/bg_miuix_dialog</item>
+    </style>
+
+    <style name="Widget.GestureEVO.PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/bg_miuix_dialog</item>
+    </style>
+
 </resources>

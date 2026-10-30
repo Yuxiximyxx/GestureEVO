@@ -9,7 +9,7 @@
   android:clickable="true"
   android:focusable="true"
   android:foreground="?attr/selectableItemBackground"
-  app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+  app:cardBackgroundColor="@color/miuix_card"
   app:cardCornerRadius="18dp"
   app:cardElevation="1dp"
   app:strokeColor="?attr/colorOutlineVariant"
@@ -23,7 +23,7 @@
     <ImageView
       android:layout_width="32dp"
       android:layout_height="32dp"
-      android:background="?attr/colorSurfaceContainerHighest"
+      android:background="@color/miuix_panel"
       android:padding="6dp"
       android:src="@drawable/alarm_24px"
       app:tint="?attr/colorOnSurfaceVariant"

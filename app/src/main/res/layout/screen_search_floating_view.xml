@@ -41,7 +41,8 @@
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat
+                style="@style/Widget.GestureEVO.MiuixSwitch"
                 android:id="@+id/switchAccessibilityMode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -21,6 +21,8 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/actionSelect"
         style="@style/Widget.Material3.Button.OutlinedButton"
+        app:cornerRadius="20dp"
+        app:strokeColor="@color/miuix_divider"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"

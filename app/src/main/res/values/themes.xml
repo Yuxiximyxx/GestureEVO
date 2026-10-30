@@ -7,11 +7,18 @@
     <item name="android:navigationBarColor">@android:color/transparent</item>
     <item name="android:statusBarColor">@android:color/transparent</item>
     <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+    <!-- MIUIX dialogs / bottom sheets / popups app-wide (round 2). -->
+    <item name="materialAlertDialogTheme">@style/ThemeOverlay.GestureEVO.MaterialAlertDialog</item>
+    <item name="alertDialogTheme">@style/ThemeOverlay.GestureEVO.AlertDialog</item>
+    <item name="bottomSheetDialogTheme">@style/ThemeOverlay.GestureEVO.BottomSheetDialog</item>
+    <item name="listPopupWindowStyle">@style/Widget.GestureEVO.ListPopupWindow</item>
+    <item name="popupMenuStyle">@style/Widget.GestureEVO.PopupMenu</item>
   </style>
   <style name="ThemeOverlay.BottomSheetDialog.Scrollable" parent="ThemeOverlay.Material3.BottomSheetDialog">
     <item name="bottomSheetStyle">@style/Widget.Catalog.BottomSheet.Modal.Scrollable</item>
+    <item name="colorSurface">@color/miuix_card</item>
   </style>
-  <style name="Widget.Catalog.BottomSheet.Modal.Scrollable" parent="Widget.Material3.BottomSheet.Modal">
+  <style name="Widget.Catalog.BottomSheet.Modal.Scrollable" parent="Widget.GestureEVO.BottomSheet.Modal">
     <item name="paddingBottomSystemWindowInsets">false</item>
     <item name="behavior_skipCollapsed">true</item>
     <item name="behavior_fitToContents">true</item>
@@ -23,15 +30,20 @@
     <item name="android:layout_height">match_parent</item>
     <item name="android:layout_margin">3dp</item>
     <item name="android:layout_weight">1</item>
+    <!-- MIUIX key surface for the quick-search keyboard (round 2). -->
+    <item name="cardBackgroundColor">@color/miuix_panel</item>
+    <item name="cardCornerRadius">12dp</item>
+    <item name="cardElevation">0dp</item>
   </style>
+  <!-- Participle (BigBang) word items retargeted to MIUIX tokens (round 2). -->
   <style name="Theme.participleItem" parent="Theme.Material3.Light.NoActionBar">
-    <item name="android:background">@color/white_grey_deep</item>
+    <item name="android:background">@color/miuix_panel</item>
     <item name="cardBackgroundColor">?attr/cardBackgroundColor</item>
-    <item name="android:textColor">@color/grey8</item>
+    <item name="android:textColor">@color/miuix_text_primary</item>
   </style>
   <style name="Theme.participleItemBg" parent="Theme.Material3.Light.NoActionBar">
-    <item name="cardBackgroundColor">@color/cardColorOther_light</item>
-    <item name="android:textColor">@color/black</item>
+    <item name="cardBackgroundColor">@color/miuix_card</item>
+    <item name="android:textColor">@color/miuix_text_primary</item>
   </style>
   <!-- 背景透明样式：保持透视，同时跳过系统窗口转场，避免桌面开启动画透出来。 -->
   <style name="Theme.GestureEVO.transparent" parent="Theme.GestureEVO">

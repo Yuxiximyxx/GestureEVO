@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Shared row content for settings-home entries (MIUIX form): pastel icon tile,
-  title + summary, trailing chevron. The card surface itself (segment
-  background, corners, divider) comes from the preference_home_* layouts that
-  include this content.
+  Shared row content for settings-home entries (MIUIX form): bare colored
+  glyph (no icon tile background since round 2), title + summary, trailing
+  chevron. The card surface itself (segment background, corners, divider)
+  comes from the preference_home_* layouts that include this content.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -17,10 +17,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@android:id/icon"
-        android:layout_width="@dimen/miuix_tile_size"
-        android:layout_height="@dimen/miuix_tile_size"
-        android:background="@drawable/bg_miuix_icon_tile"
-        android:padding="9dp"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
         android:scaleType="centerInside" />
 
     <LinearLayout

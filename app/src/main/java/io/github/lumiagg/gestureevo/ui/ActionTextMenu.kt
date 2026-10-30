@@ -60,7 +60,7 @@ class ActionTextMenuCard(context: Context) : MaterialCardView(context) {
     }
 
     init {
-        radius = 12.dp2px
+        radius = 20.dp2px
         cardElevation = 0f
         minimumWidth = menuMinWidth
         addView(menuContainer)
@@ -89,11 +89,17 @@ class ActionTextMenuCard(context: Context) : MaterialCardView(context) {
     fun refreshTheme(config: Configuration? = null) {
         val source = config?.let { context.createConfigurationContext(it) } ?: context
         themedContext = DynamicColorUtils.dynamicThemedContext(source)
-        val surface = DynamicColorUtils.surfaceContainerHighColor.takeIf { it != 0 }
-            ?: resolveThemeColor(com.google.android.material.R.attr.colorSurfaceContainerHigh)
+        val isGlass = cardBlurEnabled || backgroundBlurEnabled
+        // Round 2 MIUIX: the plain (non-glass) menu surface follows the miuix
+        // card token; the glass path keeps the dynamic surface.
+        val surface = if (isGlass) {
+            DynamicColorUtils.surfaceContainerHighColor.takeIf { it != 0 }
+                ?: resolveThemeColor(com.google.android.material.R.attr.colorSurfaceContainerHigh)
+        } else {
+            ContextCompat.getColor(context, io.github.lumiagg.gestureevo.R.color.miuix_card)
+        }
         val onSurface = DynamicColorUtils.onSurfaceColor.takeIf { it != 0 }
             ?: resolveThemeColor(com.google.android.material.R.attr.colorOnSurface)
-        val isGlass = cardBlurEnabled || backgroundBlurEnabled
         GlassEffectUtils.applyCardStyle(
             card = this,
             color = surface,

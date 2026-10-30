@@ -235,10 +235,19 @@ class SettingsActivity : AppCompatActivity() {
 
         override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            // Breathing room below the last home card group.
-            val bottom = (28 * resources.displayMetrics.density).toInt()
-            listView.setPadding(0, 0, 0, bottom)
+            // Round 2 insets fix: the home list previously used a fixed 28dp
+            // bottom spacer, which is less than the 3-button navigation bar
+            // height — the last card group could slide under the transparent
+            // (immersive) navigation bar. Pad by the real navigation-bar
+            // inset plus a small breathing space instead.
             listView.clipToPadding = false
+            val breathing = (12 * resources.displayMetrics.density).toInt()
+            ViewCompat.setOnApplyWindowInsetsListener(listView) { v, insets ->
+                val navBottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+                v.setPadding(0, 0, 0, navBottom + breathing)
+                insets
+            }
+            ViewCompat.requestApplyInsets(listView)
         }
 
         /**

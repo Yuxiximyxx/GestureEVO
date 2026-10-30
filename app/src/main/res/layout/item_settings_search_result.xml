@@ -8,8 +8,8 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-    app:cardCornerRadius="18dp"
+    app:cardBackgroundColor="@color/miuix_card"
+    app:cardCornerRadius="20dp"
     app:strokeWidth="0dp">
 
     <LinearLayout

@@ -91,7 +91,13 @@ internal fun showGuidePracticeSequence(
     val card = MaterialCardView(context).apply {
         radius = 24f.dp2px
         cardElevation = 8f.dp2px
-        setCardBackgroundColor(DynamicColorUtils.surfaceContainerColor)
+        // Round 2 MIUIX: card surface follows the miuix card token.
+        setCardBackgroundColor(
+            androidx.core.content.ContextCompat.getColor(
+                context,
+                io.github.lumiagg.gestureevo.R.color.miuix_card
+            )
+        )
         strokeWidth = 0
     }
     val cardParams = FrameLayout.LayoutParams(

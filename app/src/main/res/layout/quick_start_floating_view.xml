@@ -10,6 +10,7 @@
         android:layout_height="match_parent"
         android:clickable="true"
         android:focusable="true"
+        app:cardBackgroundColor="@color/miuix_card"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

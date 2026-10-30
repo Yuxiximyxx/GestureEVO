@@ -10,11 +10,13 @@ import androidx.preference.PreferenceViewHolder
 import io.github.lumiagg.gestureevo.R
 
 /**
- * Settings-home entry rendered the MIUIX way: the entry icon sits on a pastel
- * rounded tile ([miuixTileColor]) and the glyph is tinted with the matching
- * saturated color ([miuixGlyphColor]). Colors come from the miuix token
- * palette, so they follow light/night resources automatically.
- * Purely visual: all preference behavior stays with the base class.
+ * Settings-home entry rendered the MIUIX way: the entry glyph is tinted with
+ * its saturated color ([miuixGlyphColor]). Since round 2 the glyph stands on
+ * its own — no pastel tile background is applied ([miuixTileColor] is still
+ * parsed for layout compatibility but intentionally unused). Colors come
+ * from the miuix token palette, so they follow light/night resources
+ * automatically. Purely visual: all preference behavior stays with the
+ * base class.
  */
 class HomeEntryPreference @JvmOverloads constructor(
     context: Context,
@@ -36,9 +38,10 @@ class HomeEntryPreference @JvmOverloads constructor(
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
         val iconView = holder.findViewById(android.R.id.icon) as? ImageView ?: return
-        if (tileColor != 0) {
-            iconView.backgroundTintList = ColorStateList.valueOf(tileColor)
-        }
+        // Round 2: no icon tile background — clear any recycled tint and keep
+        // only the per-entry glyph color.
+        iconView.background = null
+        iconView.backgroundTintList = null
         if (glyphColor != 0) {
             iconView.imageTintList = ColorStateList.valueOf(glyphColor)
         }
