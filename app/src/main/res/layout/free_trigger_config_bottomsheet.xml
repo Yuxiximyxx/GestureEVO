@@ -119,7 +119,7 @@
                     app:settingsRowSummary="@string/free_trigger_mirror_desc"
                     app:settingsRowTitle="@string/free_trigger_mirror_title">
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
+                    <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
                         android:id="@+id/mirrorSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
@@ -132,7 +132,7 @@
                     app:settingsRowSummary="@string/free_trigger_keyboard_layer_desc"
                     app:settingsRowTitle="@string/free_trigger_keyboard_layer_title">
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
+                    <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
                         android:id="@+id/belowKeyboardSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
@@ -145,7 +145,7 @@
                     app:settingsRowSummary="@string/free_trigger_follow_touch_desc"
                     app:settingsRowTitle="@string/free_trigger_follow_touch_title">
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
+                    <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
                         android:id="@+id/followTriggerPointSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
@@ -158,7 +158,7 @@
                     app:settingsRowSummary="@string/free_trigger_feedback_desc"
                     app:settingsRowTitle="@string/free_trigger_feedback_title">
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
+                    <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
                         android:id="@+id/feedbackSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />

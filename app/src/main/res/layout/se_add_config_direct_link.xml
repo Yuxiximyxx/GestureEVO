@@ -106,7 +106,7 @@
       android:layout_marginTop="8dp"
       android:visibility="gone"
       app:settingsRowTitle="@string/se_direct_link_use_custom_tabs">
-      <com.google.android.material.materialswitch.MaterialSwitch
+      <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
         android:id="@+id/useCustomTabsSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

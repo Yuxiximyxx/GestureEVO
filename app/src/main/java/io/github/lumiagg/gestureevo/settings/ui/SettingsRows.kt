@@ -12,12 +12,11 @@ import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isGone
 import androidx.core.widget.doAfterTextChanged
-import com.google.android.material.color.MaterialColors
 import io.github.lumiagg.gestureevo.R
-import io.github.lumiagg.gestureevo.utils.DynamicColorUtils
 import io.github.lumiagg.gestureevo.utils.dp2px
 
 class SettingsNavRow @JvmOverloads constructor(
@@ -35,11 +34,11 @@ class SettingsNavRow @JvmOverloads constructor(
     init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
-        minimumHeight = 64f.dp2px.toInt()
-        val padH = 14f.dp2px.toInt()
-        val padV = 10f.dp2px.toInt()
+        minimumHeight = 60f.dp2px.toInt()
+        val padH = resources.getDimensionPixelSize(R.dimen.miuix_row_padding_horizontal)
+        val padV = 12f.dp2px.toInt()
         setPadding(padH, padV, padH, padV)
-        setBackgroundResource(R.drawable.bg_settings_tile)
+        setBackgroundResource(R.drawable.bg_miuix_row)
         isClickable = true
         isFocusable = true
 
@@ -75,10 +74,10 @@ class SettingsNavRow @JvmOverloads constructor(
                 }
                 background = GradientDrawable().apply {
                     shape = GradientDrawable.OVAL
-                    setColor(DynamicColorUtils.surfaceContainerHighColor)
+                    setColor(ContextCompat.getColor(context, R.color.miuix_panel))
                     setStroke(
                         1f.dp2px.toInt().coerceAtLeast(1),
-                        DynamicColorUtils.outlineColor,
+                        ContextCompat.getColor(context, R.color.miuix_divider),
                     )
                 }
             }.also { addView(it) }
@@ -88,22 +87,12 @@ class SettingsNavRow @JvmOverloads constructor(
         valueSlotIndex = childCount
 
         chevronView = ImageView(context).apply {
-            layoutParams = LayoutParams(32f.dp2px.toInt(), 32f.dp2px.toInt()).apply {
+            layoutParams = LayoutParams(20f.dp2px.toInt(), 20f.dp2px.toInt()).apply {
                 marginStart = 12f.dp2px.toInt()
             }
-            val inset = 6f.dp2px.toInt()
-            setPadding(inset, inset, inset, inset)
             setImageResource(trailingIcon)
-            background = GradientDrawable().apply {
-                shape = GradientDrawable.OVAL
-                setColor(DynamicColorUtils.secondaryContainerColor)
-            }
             imageTintList = ColorStateList.valueOf(
-                MaterialColors.getColor(
-                    this,
-                    com.google.android.material.R.attr.colorOnSecondaryContainer,
-                    0,
-                )
+                ContextCompat.getColor(context, R.color.miuix_chevron)
             )
             importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
         }
@@ -130,8 +119,7 @@ class SettingsNavRow @JvmOverloads constructor(
             child.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
                 marginStart = 12f.dp2px.toInt()
             }
-            child.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge)
-            child.setTextColor(DynamicColorUtils.primaryColor)
+            child.setTextAppearance(R.style.TextAppearance_GestureEVO_MiuixRowValue)
             child.maxLines = 2
             child.ellipsize = TextUtils.TruncateAt.END
             child.gravity = Gravity.END
@@ -153,14 +141,10 @@ class SettingsNavRow @JvmOverloads constructor(
             this.text = text
             setTextAppearance(
                 if (isTitle) {
-                    com.google.android.material.R.style.TextAppearance_Material3_TitleSmall
+                    R.style.TextAppearance_GestureEVO_MiuixRowTitle
                 } else {
-                    com.google.android.material.R.style.TextAppearance_Material3_BodySmall
+                    R.style.TextAppearance_GestureEVO_MiuixRowSummary
                 }
-            )
-            setTextColor(
-                if (isTitle) DynamicColorUtils.onSurfaceColor
-                else DynamicColorUtils.onSurfaceVariantColor
             )
             if (!isTitle) {
                 val top = 2f.dp2px.toInt()
@@ -182,11 +166,11 @@ class SettingsSwitchRow @JvmOverloads constructor(
     init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
-        minimumHeight = 64f.dp2px.toInt()
-        val padH = 14f.dp2px.toInt()
-        val padV = 10f.dp2px.toInt()
+        minimumHeight = 60f.dp2px.toInt()
+        val padH = resources.getDimensionPixelSize(R.dimen.miuix_row_padding_horizontal)
+        val padV = 12f.dp2px.toInt()
         setPadding(padH, padV, padH, padV)
-        setBackgroundResource(R.drawable.bg_settings_tile)
+        setBackgroundResource(R.drawable.bg_miuix_row)
         isClickable = true
         isFocusable = true
 
@@ -227,14 +211,10 @@ class SettingsSwitchRow @JvmOverloads constructor(
             this.text = text
             setTextAppearance(
                 if (isTitle) {
-                    com.google.android.material.R.style.TextAppearance_Material3_TitleSmall
+                    R.style.TextAppearance_GestureEVO_MiuixRowTitle
                 } else {
-                    com.google.android.material.R.style.TextAppearance_Material3_BodySmall
+                    R.style.TextAppearance_GestureEVO_MiuixRowSummary
                 }
-            )
-            setTextColor(
-                if (isTitle) DynamicColorUtils.onSurfaceColor
-                else DynamicColorUtils.onSurfaceVariantColor
             )
             if (!isTitle) setPadding(0, 2f.dp2px.toInt(), 0, 0)
         }

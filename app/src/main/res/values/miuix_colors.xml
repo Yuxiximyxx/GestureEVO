@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MIUIX design tokens (light) for the settings surfaces.
+  Hand-imitated HyperOS/MIUIX visual language on the existing View stack:
+  light-gray page, white grouped cards, blue accent, gray secondary text.
+  Night counterparts live in values-night/miuix_colors.xml with the same names.
+-->
+<resources>
+    <color name="miuix_page_bg">#F1F1F4</color>
+    <color name="miuix_card">#FFFFFF</color>
+    <color name="miuix_panel">#F5F5F7</color>
+    <color name="miuix_search_bg">#E6E6EA</color>
+    <color name="miuix_text_primary">#000000</color>
+    <color name="miuix_text_secondary">#8E8E93</color>
+    <color name="miuix_label">#5E5E63</color>
+    <color name="miuix_accent">#3482FF</color>
+    <color name="miuix_divider">#E7E7EB</color>
+    <color name="miuix_chevron">#B9B9BE</color>
+    <color name="miuix_ripple">#1A000000</color>
+    <color name="miuix_switch_on">#3482FF</color>
+    <color name="miuix_switch_off">#E4E4E9</color>
+    <color name="miuix_switch_thumb">#FFFFFF</color>
+    <color name="miuix_switch_thumb_stroke">#14000000</color>
+    <color name="miuix_status_green">#34C759</color>
+
+    <!-- Settings-home entry icon tiles: pastel tile + saturated glyph. -->
+    <color name="miuix_tile_green_bg">#D9F4E0</color>
+    <color name="miuix_tile_green_fg">#26B24A</color>
+    <color name="miuix_tile_blue_bg">#DCE9FE</color>
+    <color name="miuix_tile_blue_fg">#3482FF</color>
+    <color name="miuix_tile_orange_bg">#FDEBD3</color>
+    <color name="miuix_tile_orange_fg">#EF8F0A</color>
+    <color name="miuix_tile_purple_bg">#E6DEFC</color>
+    <color name="miuix_tile_purple_fg">#7A5AF8</color>
+    <color name="miuix_tile_pink_bg">#FBE0EC</color>
+    <color name="miuix_tile_pink_fg">#E64980</color>
+    <color name="miuix_tile_teal_bg">#D7F2EA</color>
+    <color name="miuix_tile_teal_fg">#0CA678</color>
+    <color name="miuix_tile_cyan_bg">#D6F0F7</color>
+    <color name="miuix_tile_cyan_fg">#0E9BB5</color>
+    <color name="miuix_tile_indigo_bg">#E0E3FC</color>
+    <color name="miuix_tile_indigo_fg">#5B5BD6</color>
+    <color name="miuix_tile_violet_bg">#EDDEF9</color>
+    <color name="miuix_tile_violet_fg">#A03DD6</color>
+    <color name="miuix_tile_lime_bg">#E6F6DC</color>
+    <color name="miuix_tile_lime_fg">#5FAE28</color>
+    <color name="miuix_tile_gray_bg">#E9E9EC</color>
+    <color name="miuix_tile_gray_fg">#636366</color>
+</resources>

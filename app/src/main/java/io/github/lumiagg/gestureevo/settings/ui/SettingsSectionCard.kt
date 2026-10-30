@@ -2,6 +2,7 @@
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Parcel
 import android.os.Parcelable
 import android.transition.ChangeBounds
@@ -16,11 +17,11 @@ import android.view.animation.PathInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isGone
 import com.google.android.material.card.MaterialCardView
 import io.github.lumiagg.gestureevo.R
-import io.github.lumiagg.gestureevo.utils.DynamicColorUtils
 import io.github.lumiagg.gestureevo.utils.dp2px
 
 class SettingsSectionCard @JvmOverloads constructor(
@@ -38,7 +39,10 @@ class SettingsSectionCard @JvmOverloads constructor(
     private val expandInterpolator = PathInterpolator(0.2f, 0f, 0f, 1f)
 
     init {
-        radius = resources.getDimension(R.dimen.settings_card_corner_radius)
+        // MIUIX form: this view is a transparent group shell. The section title
+        // renders as a gray label above, and the children sit on a separate
+        // white rounded card (see contentContainer below).
+        radius = resources.getDimension(R.dimen.miuix_card_radius)
         strokeWidth = 0
         cardElevation = 0f
         maxCardElevation = 0f
@@ -47,7 +51,7 @@ class SettingsSectionCard @JvmOverloads constructor(
         stateListAnimator = null
         useCompatPadding = false
         preventCornerOverlap = false
-        setCardBackgroundColor(DynamicColorUtils.surfaceContainerColor)
+        setCardBackgroundColor(Color.TRANSPARENT)
         isFocusable = true
 
         var title: CharSequence = ""
@@ -70,9 +74,8 @@ class SettingsSectionCard @JvmOverloads constructor(
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             gravity = Gravity.CENTER_VERTICAL
-            minimumHeight = 56f.dp2px.toInt()
             orientation = LinearLayout.HORIZONTAL
-            setPadding(16f.dp2px.toInt(), 12f.dp2px.toInt(), 16f.dp2px.toInt(), 12f.dp2px.toInt())
+            setPadding(6f.dp2px.toInt(), 14f.dp2px.toInt(), 6f.dp2px.toInt(), 8f.dp2px.toInt())
             isClickable = true
             isFocusable = true
             foreground = context.obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground)).let {
@@ -96,13 +99,12 @@ class SettingsSectionCard @JvmOverloads constructor(
 
         titleView = TextView(context).apply {
             text = title
-            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium)
-            setTextColor(DynamicColorUtils.onSurfaceColor)
+            setTextAppearance(R.style.TextAppearance_GestureEVO_MiuixGroupLabel)
         }
         summaryView = TextView(context).apply {
             text = summary
-            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall)
-            setTextColor(DynamicColorUtils.onSurfaceVariantColor)
+            setTextAppearance(R.style.TextAppearance_GestureEVO_MiuixRowSummary)
+            setPadding(0, 2f.dp2px.toInt(), 0, 0)
             isGone = summary.isBlank()
         }
         titleColumn.addView(titleView)
@@ -114,7 +116,9 @@ class SettingsSectionCard @JvmOverloads constructor(
             }
             setImageResource(R.drawable.ic_chevron_right)
             contentDescription = null
-            imageTintList = ColorStateList.valueOf(DynamicColorUtils.onSurfaceVariantColor)
+            imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(context, R.color.miuix_chevron)
+            )
         }
 
         contentContainer = LinearLayout(context).apply {
@@ -123,6 +127,14 @@ class SettingsSectionCard @JvmOverloads constructor(
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             orientation = LinearLayout.VERTICAL
+            background = ContextCompat.getDrawable(context, R.drawable.bg_miuix_card)
+            clipToOutline = true
+        }
+
+        if (title.isBlank() && summary.isBlank()) {
+            // Untitled groups (e.g. list items) keep just a slim expand handle
+            // above the card instead of an empty label strip.
+            header.setPadding(6f.dp2px.toInt(), 4f.dp2px.toInt(), 6f.dp2px.toInt(), 0)
         }
 
         header.addView(titleColumn)

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MIUIX design tokens: dimensions shared by all settings surfaces. -->
+<resources>
+    <dimen name="miuix_card_radius">20dp</dimen>
+    <dimen name="miuix_page_padding">16dp</dimen>
+    <dimen name="miuix_row_padding_horizontal">16dp</dimen>
+    <dimen name="miuix_tile_radius">12dp</dimen>
+    <dimen name="miuix_tile_size">40dp</dimen>
+    <dimen name="miuix_group_gap">20dp</dimen>
+</resources>

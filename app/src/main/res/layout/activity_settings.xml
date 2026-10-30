@@ -3,21 +3,44 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:background="@color/miuix_page_bg"
   android:fitsSystemWindows="false">
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/app_bar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorSurface"
+    android:background="@color/miuix_page_bg"
     android:elevation="0dp"
     android:paddingTop="12dp"
-    android:paddingBottom="8dp">
+    android:paddingBottom="4dp">
     <LinearLayout
       android:id="@+id/toolbar_layout"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
       app:liftOnScroll="true">
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="14dp">
+        <TextView
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="@string/settings_title"
+          android:textColor="@color/miuix_text_primary"
+          android:textSize="32sp"
+          android:textStyle="bold" />
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/app_name"
+          android:textColor="@color/miuix_text_secondary"
+          android:textSize="13sp" />
+      </LinearLayout>
       <com.google.android.material.card.MaterialCardView
         android:id="@+id/settingsSearchEntryCard"
         android:layout_width="match_parent"
@@ -27,7 +50,7 @@
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
         android:transitionName="@string/settings_search_box_transition_name"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+        app:cardBackgroundColor="@color/miuix_search_bg"
         app:cardCornerRadius="28dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp">
@@ -41,9 +64,9 @@
           android:drawablePadding="14dp"
           android:text="@string/settings_search_hint"
           android:textAppearance="?attr/textAppearanceBodyLarge"
-          android:textColor="?attr/colorOnSurfaceVariant"
+          android:textColor="@color/miuix_text_secondary"
           app:drawableStartCompat="@drawable/settings_search_icon"
-          app:drawableTint="?attr/colorOnSurfaceVariant" />
+          app:drawableTint="@color/miuix_text_secondary" />
       </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
   </com.google.android.material.appbar.AppBarLayout>
@@ -55,7 +78,6 @@
     <FrameLayout
       android:id="@+id/settings"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:paddingTop="4dp" />
+      android:layout_height="match_parent" />
   </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

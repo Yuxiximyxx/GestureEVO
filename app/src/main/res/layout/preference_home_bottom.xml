@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings-home card segment: last row of a group. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/miuix_page_padding"
+    android:background="@drawable/bg_miuix_seg_bottom">
+
+    <include layout="@layout/custom_preference_widget_layout" />
+
+</FrameLayout>

@@ -1,66 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+  Shared row content for settings-home entries (MIUIX form): pastel icon tile,
+  title + summary, trailing chevron. The card surface itself (segment
+  background, corners, divider) comes from the preference_home_* layouts that
+  include this content.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="?attr/materialCardViewFilledStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp"
-    android:checkable="true"
-    app:cardCornerRadius="@dimen/settings_card_corner_radius">
+    android:gravity="center_vertical"
+    android:minHeight="64dp"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
 
-    <RelativeLayout
-        android:id="@+id/triggerLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@android:id/icon"
+        android:layout_width="@dimen/miuix_tile_size"
+        android:layout_height="@dimen/miuix_tile_size"
+        android:background="@drawable/bg_miuix_icon_tile"
+        android:padding="9dp"
+        android:scaleType="centerInside" />
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@android:id/icon"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_centerVertical="true"
-            android:padding="25dp"
-            android:tint="?attr/colorPrimary" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@android:id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp"
-            android:layout_toStartOf="@android:id/widget_frame"
-            android:layout_toEndOf="@android:id/icon"
-            android:orientation="vertical">
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.GestureEVO.MiuixRowTitle"
+            android:textSize="17sp" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@android:id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/setting_gesture"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textAppearance="@style/MaterialAlertDialog.Material3.Title.Text" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@android:id/summary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/accessibility_service_off_tips"
-                android:textSize="15sp"
-                android:textAppearance="@style/MaterialAlertDialog.Material3.Body.Text"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@android:id/widget_frame"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@android:id/summary"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp"
-            android:orientation="vertical" />
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.GestureEVO.MiuixRowSummary" />
 
+    </LinearLayout>
 
-    </RelativeLayout>
+    <LinearLayout
+        android:id="@android:id/widget_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical" />
 
-</com.google.android.material.card.MaterialCardView>
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/miuix_chevron" />
+
+</LinearLayout>

@@ -3,18 +3,18 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:fitsSystemWindows="true">
+  android:fitsSystemWindows="true" android:background="@color/miuix_page_bg">
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/app_bar"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/app_bar_height">
+    android:layout_height="@dimen/app_bar_height" android:background="@color/miuix_page_bg" android:elevation="0dp">
     <com.google.android.material.appbar.CollapsingToolbarLayout
       android:id="@+id/toolbar_layout"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:fitsSystemWindows="true"
       app:layout_scrollFlags="scroll|exitUntilCollapsed"
-      app:toolbarId="@+id/toolbar">
+      app:toolbarId="@+id/toolbar" app:contentScrim="@color/miuix_page_bg" app:statusBarScrim="@color/miuix_page_bg" app:expandedTitleTextAppearance="@style/TextAppearance.GestureEVO.MiuixPageTitle" app:collapsedTitleTextAppearance="@style/TextAppearance.GestureEVO.MiuixPageTitleCollapsed" app:expandedTitleMarginStart="20dp" app:expandedTitleMarginBottom="16dp">
       <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -33,7 +33,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
-      android:paddingHorizontal="@dimen/settings_card_spacing"
+      android:paddingHorizontal="@dimen/miuix_page_padding"
       android:paddingVertical="16dp">
       <io.github.lumiagg.gestureevo.settings.ui.SettingsSectionCard
         android:id="@+id/languageCard"
@@ -113,7 +113,7 @@
             android:id="@+id/appIconOverrideButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_icon_override_button"
             app:settingsRowSummary="@string/appearance_settings_icon_override_summary" />
           <LinearLayout
@@ -150,7 +150,7 @@
               android:layout_height="wrap_content"
               android:valueFrom="0"
               android:valueTo="1"
-              app:labelBehavior="floating" />
+              app:labelBehavior="floating" style="@style/Widget.GestureEVO.MiuixSlider" />
           </LinearLayout>
         </LinearLayout>
       </io.github.lumiagg.gestureevo.settings.ui.SettingsSectionCard>
@@ -173,7 +173,7 @@
             android:id="@+id/pointer_color_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_pointer_color"
             app:settingsRowSummary="@string/appearance_settings_pointer_color_summary"
             app:settingsRowSwatch="true" />
@@ -229,16 +229,16 @@
               android:stepSize="1"
               android:valueFrom="16"
               android:valueTo="48"
-              android:value="30" />
+              android:value="30" style="@style/Widget.GestureEVO.MiuixSlider" />
           </LinearLayout>
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:id="@+id/pointerClickFeedbackRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_pointer_click_feedback"
             app:settingsRowSummary="@string/appearance_settings_pointer_click_feedback_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/pointerClickFeedbackSwitch"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content" />
@@ -263,10 +263,10 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_wheel_background_blur"
             app:settingsRowSummary="@string/appearance_settings_background_blur_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/wheel_background_blur_switch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -276,7 +276,7 @@
             android:id="@+id/wheel_color_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_wheel_color"
             app:settingsRowSummary="@string/appearance_settings_wheel_color_summary"
             app:settingsRowSwatch="true" />
@@ -300,10 +300,10 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_search_background_blur"
             app:settingsRowSummary="@string/appearance_settings_background_blur_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/search_background_blur_switch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -312,10 +312,10 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_search_card_background_blur"
             app:settingsRowSummary="@string/appearance_settings_card_background_blur_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/search_card_background_blur_switch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -325,7 +325,7 @@
             android:id="@+id/search_color_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_search_color"
             app:settingsRowSummary="@string/appearance_settings_search_color_summary"
             app:settingsRowSwatch="true" />
@@ -349,10 +349,10 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_keyboard_background_blur"
             app:settingsRowSummary="@string/appearance_settings_background_blur_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/keyboard_background_blur_switch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -361,10 +361,10 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_keyboard_card_background_blur"
             app:settingsRowSummary="@string/appearance_settings_card_background_blur_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/keyboard_card_background_blur_switch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -390,10 +390,10 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_pin_pool_background_blur"
             app:settingsRowSummary="@string/appearance_settings_background_blur_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/pin_pool_background_blur_switch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -402,10 +402,10 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_pin_pool_card_background_blur"
             app:settingsRowSummary="@string/appearance_settings_card_background_blur_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/pin_pool_card_background_blur_switch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -431,10 +431,10 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_screen_content_background_blur"
             app:settingsRowSummary="@string/appearance_settings_background_blur_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/screen_content_background_blur_switch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -443,10 +443,10 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_screen_content_card_background_blur"
             app:settingsRowSummary="@string/appearance_settings_card_background_blur_summary">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/screen_content_card_background_blur_switch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -473,7 +473,7 @@
             android:id="@+id/fluid_color_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_fluid_color"
             app:settingsRowSummary="@string/appearance_settings_fluid_color_summary"
             app:settingsRowSwatch="true" />
@@ -530,7 +530,7 @@
               android:stepSize="0.05"
               android:valueFrom="0.75"
               android:valueTo="1.5"
-              app:labelBehavior="floating" />
+              app:labelBehavior="floating" style="@style/Widget.GestureEVO.MiuixSlider" />
           </LinearLayout>
           <LinearLayout
             android:layout_width="match_parent"
@@ -571,13 +571,13 @@
               android:stepSize="0.5"
               android:valueFrom="0"
               android:valueTo="6"
-              app:labelBehavior="floating" />
+              app:labelBehavior="floating" style="@style/Widget.GestureEVO.MiuixSlider" />
           </LinearLayout>
           <io.github.lumiagg.gestureevo.settings.ui.SettingsNavRow
             android:id="@+id/fluid_stroke_color_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/appearance_settings_fluid_stroke_color"
             app:settingsRowSummary="@string/appearance_settings_fluid_stroke_color_summary"
             app:settingsRowSwatch="true" />

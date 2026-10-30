@@ -3,18 +3,18 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:fitsSystemWindows="true">
+  android:fitsSystemWindows="true" android:background="@color/miuix_page_bg">
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/app_bar"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/app_bar_height">
+    android:layout_height="@dimen/app_bar_height" android:background="@color/miuix_page_bg" android:elevation="0dp">
     <com.google.android.material.appbar.CollapsingToolbarLayout
       android:id="@+id/toolbar_layout"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:fitsSystemWindows="true"
       app:layout_scrollFlags="scroll|exitUntilCollapsed"
-      app:toolbarId="@+id/toolbar">
+      app:toolbarId="@+id/toolbar" app:contentScrim="@color/miuix_page_bg" app:statusBarScrim="@color/miuix_page_bg" app:expandedTitleTextAppearance="@style/TextAppearance.GestureEVO.MiuixPageTitle" app:collapsedTitleTextAppearance="@style/TextAppearance.GestureEVO.MiuixPageTitleCollapsed" app:expandedTitleMarginStart="20dp" app:expandedTitleMarginBottom="16dp">
       <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -92,7 +92,7 @@
             android:id="@+id/selectPieGroupButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/action_view_settings_current_group_title">
             <TextView
               android:id="@+id/currentPieGroupName"
@@ -104,14 +104,14 @@
             android:id="@+id/addPieGroupButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/action_view_settings_add_group"
             app:settingsRowSummary="@string/action_view_settings_add_group_summary" />
           <io.github.lumiagg.gestureevo.settings.ui.SettingsNavRow
             android:id="@+id/managePieGroupButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/action_view_settings_manage"
             app:settingsRowSummary="@string/action_view_settings_manage_summary" />
         </LinearLayout>
@@ -152,7 +152,7 @@
             android:id="@+id/previewTriggerButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/action_view_preview_trigger_title">
             <TextView
               android:id="@+id/previewTriggerName"
@@ -163,7 +163,7 @@
             android:id="@+id/previewPieButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/action_view_settings_preview_button"
             app:settingsRowSummary="@string/action_view_preview_button_summary" />
         </LinearLayout>
@@ -205,28 +205,28 @@
               android:id="@+id/pieContentConfigEntry"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginTop="8dp"
+              android:layout_marginHorizontal="-12dp"
               app:settingsRowTitle="@string/action_view_settings_content_entry_title"
               app:settingsRowSummary="@string/action_view_settings_content_entry_summary" />
             <io.github.lumiagg.gestureevo.settings.ui.SettingsNavRow
               android:id="@+id/pieStyleConfigEntry"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginTop="8dp"
+              android:layout_marginHorizontal="-12dp"
               app:settingsRowTitle="@string/action_view_settings_main_style_entry_title"
               app:settingsRowSummary="@string/action_view_settings_main_style_entry_summary" />
             <io.github.lumiagg.gestureevo.settings.ui.SettingsNavRow
               android:id="@+id/pieSubStyleConfigEntry"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginTop="8dp"
+              android:layout_marginHorizontal="-12dp"
               app:settingsRowTitle="@string/action_view_settings_sub_style_entry_title"
               app:settingsRowSummary="@string/action_view_settings_sub_style_entry_summary" />
             <io.github.lumiagg.gestureevo.settings.ui.SettingsNavRow
               android:id="@+id/pieRecentBlackListButton"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginTop="8dp"
+              android:layout_marginHorizontal="-12dp"
               app:settingsRowTitle="@string/action_view_settings_blacklist_manage"
               app:settingsRowSummary="@string/action_view_settings_blacklist_description" />
           </LinearLayout>
@@ -263,13 +263,13 @@
             android:valueFrom="0"
             android:valueTo="200"
             android:visibility="gone"
-            app:labelBehavior="floating" />
+            app:labelBehavior="floating" style="@style/Widget.GestureEVO.MiuixSlider" />
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/action_view_settings_selected_hint">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/selectedHintIconSwitch"
               android:checked="true"
               android:layout_width="wrap_content"
@@ -278,9 +278,9 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/action_view_settings_show_anim">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/mainViewShowAnimSwitch"
               android:checked="true"
               android:layout_width="wrap_content"
@@ -289,9 +289,9 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/action_view_settings_show_vibrate">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/mainViewShowVibrateSwitch"
               android:checked="true"
               android:layout_width="wrap_content"
@@ -300,9 +300,9 @@
           <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-12dp"
             app:settingsRowTitle="@string/action_view_settings_disable_all_wheel_vibrate">
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
               android:id="@+id/disableAllWheelVibrateSwitch"
               android:checked="false"
               android:layout_width="wrap_content"
@@ -378,14 +378,14 @@
               android:id="@+id/externalCallConfigButton"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginTop="8dp"
+              android:layout_marginHorizontal="-12dp"
               app:settingsRowTitle="@string/external_call_config_button"
               app:settingsRowSummary="@string/external_call_config_summary" />
             <io.github.lumiagg.gestureevo.settings.ui.SettingsNavRow
               android:id="@+id/externalCallCopyButton"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginTop="8dp"
+              android:layout_marginHorizontal="-12dp"
               app:settingsRowTitle="@string/external_call_copy_button"
               app:settingsRowSummary="@string/external_call_copy_summary"
               app:settingsRowTrailingIcon="@drawable/ic_baseline_content_copy_24" />

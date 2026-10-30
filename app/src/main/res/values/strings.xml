@@ -410,6 +410,7 @@
     <string name="settings_gesture_title">手势</string>
     <string name="settings_features_title">功能</string>
     <string name="settings_about_title">关于</string>
+    <string name="settings_accessibility_service_label">无障碍服务</string>
     <string name="settings_accessibility_running">服务正在运行</string>
     <string name="settings_accessibility_off">请确保无障碍服务是打开的!</string>
     <string name="accessibility_service_off_tips">本应用需要先开启无障碍服务才能使用</string>

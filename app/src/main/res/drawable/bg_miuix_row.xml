@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MIUIX settings row background: transparent face on the card, one hairline
+  divider along the bottom, inset to the row's text edges.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+    <item
+        android:height="1px"
+        android:left="@dimen/miuix_row_padding_horizontal"
+        android:right="@dimen/miuix_row_padding_horizontal"
+        android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/miuix_divider" />
+        </shape>
+    </item>
+</layer-list>

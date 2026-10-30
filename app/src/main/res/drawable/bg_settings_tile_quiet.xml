@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- MIUIX inset panel: soft gray block used for notes/info inside cards and sheets. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="?attr/colorSurfaceContainerHigh" />
-    <corners android:radius="12dp" />
+    <solid android:color="@color/miuix_panel" />
+    <corners android:radius="14dp" />
 </shape>

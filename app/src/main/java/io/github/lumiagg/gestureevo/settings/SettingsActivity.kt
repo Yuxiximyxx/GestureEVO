@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import androidx.core.app.ActivityOptionsCompat
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -20,7 +21,6 @@ import androidx.preference.PreferenceFragmentCompat
 import io.github.lumiagg.gestureevo.R
 import io.github.lumiagg.gestureevo.databinding.ActivitySettingsBinding
 import io.github.lumiagg.gestureevo.settings.ui.showAboutBottomSheet
-import io.github.lumiagg.gestureevo.utils.DynamicColorUtils
 import io.github.lumiagg.gestureevo.utils.PreferenceDataStoreAdapter
 import io.github.lumiagg.gestureevo.utils.readKey
 import io.github.lumiagg.gestureevo.utils.saveKey
@@ -55,7 +55,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupSystemBars() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = DynamicColorUtils.surfaceContainerColor
+        window.statusBarColor = ContextCompat.getColor(this, R.color.miuix_page_bg)
     }
 
     private fun applySystemBarInsets() {
@@ -103,6 +103,7 @@ class SettingsActivity : AppCompatActivity() {
             preferenceManager.preferenceDataStore =
                 PreferenceDataStoreAdapter(requireContext().settingsStore, lifecycleScope)
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+            applyHomeCardSegments()
 
             findPreference<Preference>("preferenceSettingsGuide")?.setOnPreferenceClickListener {
                 startActivity(Intent(requireActivity(), SettingsGuideActivity::class.java))
@@ -230,6 +231,51 @@ class SettingsActivity : AppCompatActivity() {
             super.onResume()
             preferenceService?.let { updateAccessibilityServiceStatus(it) }
             handlePendingNavigation()
+        }
+
+        override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            // Breathing room below the last home card group.
+            val bottom = (28 * resources.displayMetrics.density).toInt()
+            listView.setPadding(0, 0, 0, bottom)
+            listView.clipToPadding = false
+        }
+
+        /**
+         * MIUIX grouping for the home list: entries are rendered as segments of
+         * three white cards (status / main entries / secondary entries), so each
+         * entry gets the segment layout matching its position inside its group.
+         * Visual only; keys, order and click handling are untouched.
+         */
+        private fun applyHomeCardSegments() {
+            val groups = listOf(
+                listOf("preferenceService", "preferenceSettingsGuide"),
+                listOf(
+                    "preferenceConfigTrigger",
+                    "preferenceActionView",
+                    "preferenceAppearance",
+                    "preferenceInspire",
+                    "preferenceSearch",
+                    "preferenceFreeform",
+                ),
+                listOf(
+                    "preferenceData",
+                    "preferenceExternalAction",
+                    "preferenceBackgroundStability",
+                    "preferenceAbout",
+                ),
+            )
+            groups.forEach { keys ->
+                keys.forEachIndexed { index, key ->
+                    val preference = findPreference<Preference>(key) ?: return@forEachIndexed
+                    preference.layoutResource = when {
+                        keys.size == 1 -> R.layout.preference_home_single
+                        index == 0 -> R.layout.preference_home_top
+                        index == keys.lastIndex -> R.layout.preference_home_bottom
+                        else -> R.layout.preference_home_middle
+                    }
+                }
+            }
         }
 
         fun handlePendingNavigation() {

@@ -41,4 +41,12 @@
         <attr name="settingsRowTitle" />
         <attr name="settingsRowSummary" />
     </declare-styleable>
+
+    <attr name="miuixTileColor" format="color" />
+    <attr name="miuixGlyphColor" format="color" />
+
+    <declare-styleable name="HomeEntryPreference">
+        <attr name="miuixTileColor" />
+        <attr name="miuixGlyphColor" />
+    </declare-styleable>
 </resources>

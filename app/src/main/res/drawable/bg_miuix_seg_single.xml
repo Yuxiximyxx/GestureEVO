@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings-home card segment: only row of a group (full 20dp corners). -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/miuix_ripple">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="@dimen/miuix_card_radius" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/miuix_card" />
+            <corners android:radius="@dimen/miuix_card_radius" />
+        </shape>
+    </item>
+</ripple>

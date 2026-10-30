@@ -39,7 +39,7 @@ class FreeTriggerSettingsActivity : AppCompatActivity() {
     }
 
     private fun setupToolbar() {
-        binding.toolbar.setNavigationIcon(androidx.appcompat.R.drawable.abc_ic_ab_back_material)
+        binding.toolbar.setNavigationIcon(io.github.lumiagg.gestureevo.R.drawable.ic_miuix_back)
         binding.toolbar.setNavigationOnClickListener { finish() }
     }
 

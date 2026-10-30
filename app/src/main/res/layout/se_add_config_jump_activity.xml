@@ -89,7 +89,7 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="8dp"
           app:settingsRowTitle="@string/se_extern_jump_auto_enter">
-          <com.google.android.material.materialswitch.MaterialSwitch
+          <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
             android:id="@+id/jumpActivityAutoInputEnter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

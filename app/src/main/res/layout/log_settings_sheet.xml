@@ -15,7 +15,7 @@
             android:text="@string/log_settings_title"
             android:textAppearance="?attr/textAppearanceTitleLarge" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
+        <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
             android:id="@+id/loggingSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
             android:minHeight="56dp"
             android:text="@string/log_recording" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
+        <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
             android:id="@+id/detailedSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

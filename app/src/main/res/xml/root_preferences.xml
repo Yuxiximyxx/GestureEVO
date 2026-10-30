@@ -1,85 +1,100 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Preference
-        android:icon="@drawable/baseline_check_24"
-        android:key="preferenceSettingsGuide"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/guide_title"
-        app:summary="@string/guide_entry_summary" />
-
-    <Preference
+    <!-- Status group: accessibility service state + setup guide.
+         Row order follows the approved MIUIX mock (service state first). -->
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/icon_service"
         android:key="preferenceService"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/settings_accessibility_off" />
+        app:miuixGlyphColor="@color/miuix_tile_green_fg"
+        app:miuixTileColor="@color/miuix_tile_green_bg"
+        android:summary="@string/settings_accessibility_service_label"
+        android:title="@string/settings_accessibility_off" />
 
-    <Preference
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
+        android:icon="@drawable/baseline_check_24"
+        android:key="preferenceSettingsGuide"
+        app:miuixGlyphColor="@color/miuix_tile_blue_fg"
+        app:miuixTileColor="@color/miuix_tile_blue_bg"
+        android:summary="@string/guide_entry_summary"
+        android:title="@string/guide_title" />
+
+    <!-- Main entries group. -->
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/baseline_gesture_24"
         android:key="preferenceConfigTrigger"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/settings_gesture_title" />
+        app:miuixGlyphColor="@color/miuix_tile_orange_fg"
+        app:miuixTileColor="@color/miuix_tile_orange_bg"
+        android:title="@string/settings_gesture_title" />
 
-    <Preference
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/baseline_pie_chart_24"
         android:key="preferenceActionView"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/action_view_settings_title" />
+        app:miuixGlyphColor="@color/miuix_tile_purple_fg"
+        app:miuixTileColor="@color/miuix_tile_purple_bg"
+        android:title="@string/action_view_settings_title" />
 
-    <Preference
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/baseline_auto_awesome_24"
         android:key="preferenceAppearance"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/appearance_settings_title" />
+        app:miuixGlyphColor="@color/miuix_tile_pink_fg"
+        app:miuixTileColor="@color/miuix_tile_pink_bg"
+        android:title="@string/appearance_settings_title" />
 
-    <Preference
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/outline_center_focus_weak_24"
         android:key="preferenceInspire"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/settings_features_title" />
+        app:miuixGlyphColor="@color/miuix_tile_teal_fg"
+        app:miuixTileColor="@color/miuix_tile_teal_bg"
+        android:title="@string/settings_features_title" />
 
-    <Preference
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/search_24px"
         android:key="preferenceSearch"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/search_engine_settings_title" />
+        app:miuixGlyphColor="@color/miuix_tile_blue_fg"
+        app:miuixTileColor="@color/miuix_tile_blue_bg"
+        android:title="@string/search_engine_settings_title" />
 
-    <Preference
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/ic_little_window"
         android:key="preferenceFreeform"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/freeform_settings_title" />
+        app:miuixGlyphColor="@color/miuix_tile_cyan_fg"
+        app:miuixTileColor="@color/miuix_tile_cyan_bg"
+        android:title="@string/freeform_settings_title" />
 
-
-    <Preference
+    <!-- Secondary entries group. -->
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/baseline_save_24"
         android:key="preferenceData"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/data_backup_title" />
+        app:miuixGlyphColor="@color/miuix_tile_indigo_fg"
+        app:miuixTileColor="@color/miuix_tile_indigo_bg"
+        android:title="@string/data_backup_title" />
 
-    <Preference
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/ic_baseline_insert_link_24"
         android:key="preferenceExternalAction"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/external_action_settings_title" />
+        app:miuixGlyphColor="@color/miuix_tile_violet_fg"
+        app:miuixTileColor="@color/miuix_tile_violet_bg"
+        android:title="@string/external_action_settings_title" />
 
-    <Preference
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/icon_lock"
         android:key="preferenceBackgroundStability"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/background_stability_title" />
+        app:miuixGlyphColor="@color/miuix_tile_lime_fg"
+        app:miuixTileColor="@color/miuix_tile_lime_bg"
+        android:title="@string/background_stability_title" />
 
-    <Preference
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/baseline_info_24"
         android:key="preferenceAbout"
-        android:layout="@layout/custom_preference_widget_layout"
-        app:title="@string/settings_about_title" />
+        app:miuixGlyphColor="@color/miuix_tile_gray_fg"
+        app:miuixTileColor="@color/miuix_tile_gray_bg"
+        android:title="@string/settings_about_title" />
 
 
     <!--    <Preference-->
     <!--        android:icon="@drawable/icon_adb"-->
     <!--        android:key="preferenceGeek"-->
-    <!--        android:layout="@layout/custom_preference_widget_layout"-->
-    <!--        app:title="高级权限" />-->
+    <!--        android:title="高级权限" />-->
 
 </PreferenceScreen>

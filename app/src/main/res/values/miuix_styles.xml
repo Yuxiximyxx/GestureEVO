@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MIUIX design tokens: text appearances and widget styles for settings surfaces. -->
+<resources>
+
+    <!-- Big page title used as the CollapsingToolbarLayout expanded title on settings pages. -->
+    <style name="TextAppearance.GestureEVO.MiuixPageTitle" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/miuix_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.GestureEVO.MiuixPageTitleCollapsed" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/miuix_text_primary</item>
+    </style>
+
+    <!-- Group label rendered above each settings card. -->
+    <style name="TextAppearance.GestureEVO.MiuixGroupLabel" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/miuix_label</item>
+    </style>
+
+    <style name="TextAppearance.GestureEVO.MiuixRowTitle" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/miuix_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.GestureEVO.MiuixRowSummary" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/miuix_text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.GestureEVO.MiuixRowValue" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/miuix_text_secondary</item>
+    </style>
+
+    <!-- HyperOS-style switch: pill track (blue on / gray off), plain white thumb. -->
+    <style name="Widget.GestureEVO.MiuixSwitch" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:track">@drawable/miuix_switch_track</item>
+        <item name="android:thumb">@drawable/miuix_switch_thumb</item>
+        <item name="switchMinWidth">52dp</item>
+        <item name="switchPadding">0dp</item>
+    </style>
+
+    <!-- Slider tinted with the MIUIX accent on settings pages. -->
+    <style name="Widget.GestureEVO.MiuixSlider" parent="Widget.Material3.Slider">
+        <item name="trackColorActive">@color/miuix_accent</item>
+        <item name="trackColorInactive">@color/miuix_divider</item>
+        <item name="thumbColor">@color/miuix_accent</item>
+        <item name="haloColor">@color/miuix_divider</item>
+    </style>
+
+</resources>

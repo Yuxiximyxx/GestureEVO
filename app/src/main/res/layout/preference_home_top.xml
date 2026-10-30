@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings-home card segment: first row of a group. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/miuix_page_padding"
+    android:layout_marginTop="@dimen/miuix_group_gap"
+    android:background="@drawable/bg_miuix_seg_top">
+
+    <include layout="@layout/custom_preference_widget_layout" />
+
+</FrameLayout>

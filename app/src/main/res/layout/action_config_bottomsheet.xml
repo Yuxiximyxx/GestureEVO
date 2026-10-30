@@ -383,7 +383,7 @@
                 android:layout_marginTop="8dp"
                 app:settingsRowTitle="@string/action_config_transparent_icon">
 
-                <com.google.android.material.materialswitch.MaterialSwitch
+                <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
                     android:id="@+id/transparentIconSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
@@ -395,7 +395,7 @@
                 android:layout_marginTop="8dp"
                 app:settingsRowTitle="@string/action_config_rectangle_layout">
 
-                <com.google.android.material.materialswitch.MaterialSwitch
+                <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
                     android:id="@+id/rectangleLayoutSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
@@ -453,7 +453,7 @@
                 android:layout_marginTop="8dp"
                 app:settingsRowTitle="@string/action_config_auto_size">
 
-                <com.google.android.material.materialswitch.MaterialSwitch
+                <androidx.appcompat.widget.SwitchCompat style="@style/Widget.GestureEVO.MiuixSwitch"
                     android:id="@+id/autoSizeSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
