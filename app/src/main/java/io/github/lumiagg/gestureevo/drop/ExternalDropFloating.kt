@@ -3,11 +3,11 @@ package io.github.lumiagg.gestureevo.drop
 import android.content.ClipData
 import android.content.ClipDescription
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.util.Log
-import android.view.ContextThemeWrapper
 import android.view.DragEvent
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -47,7 +47,7 @@ class ExternalDropFloating(private val service: GestureService) :
     BaseFloatingWindow(service, service, "ExternalDrop") {
     private enum class Action { POOL, PIN, TOKENIZE, SEARCH }
 
-    private val themeContext = ContextThemeWrapper(service, R.style.Theme_GestureEVO)
+    private val themeContext = DynamicColorUtils.dynamicThemedContext(service)
     private val observer = View(service)
     private val targets = LayoutInflater.from(themeContext)
         .inflate(R.layout.external_drop_floating, null)
@@ -81,6 +81,12 @@ class ExternalDropFloating(private val service: GestureService) :
     }
 
     init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            targets.findViewById<MaterialCardView>(R.id.externalDropPanel).apply {
+                outlineAmbientShadowColor = Color.argb(48, 0, 0, 0)
+                outlineSpotShadowColor = Color.argb(64, 0, 0, 0)
+            }
+        }
         observer.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         observer.setOnDragListener { _, event ->
             when (event.action) {
@@ -205,7 +211,7 @@ class ExternalDropFloating(private val service: GestureService) :
     }
 
     private fun setHighlighted(card: MaterialCardView, active: Boolean) {
-        card.strokeWidth = (if (active) 3 else 1).dp2px.toInt()
+        card.strokeWidth = if (active) 2.dp2px.toInt() else 0
         card.strokeColor = if (active) DynamicColorUtils.primaryColor else DynamicColorUtils.outlineColor
         card.setCardBackgroundColor(
             if (active) DynamicColorUtils.secondaryContainerColor else DynamicColorUtils.surfaceContainerHighColor
@@ -309,7 +315,9 @@ class ExternalDropFloating(private val service: GestureService) :
             } else if (action == Action.TOKENIZE) {
                 InspireDataHolder.clear()
                 InspireDataHolder.replaceScreenshotBitmap(tokenImage)
-                InspireDataHolder.accessibilityContent = tokenText.takeIf { it.isNotEmpty() }
+                InspireDataHolder.accessibilityContent = tokenText
+                    .joinToString("\n")
+                    .takeIf { it.isNotEmpty() }
                 InspireContentActivity.start(service)
             } else if (action == Action.POOL) {
                 toast(R.string.external_drop_added)

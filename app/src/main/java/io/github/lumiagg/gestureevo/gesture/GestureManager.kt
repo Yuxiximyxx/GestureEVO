@@ -383,15 +383,8 @@ class GestureManager(
                         }
 
                         GestureActionType.PAUSE_GESTURE -> {
-                            val seconds = action?.firstStageUri
-                                ?.getQueryParameter("seconds")?.toIntOrNull()
-                                ?.coerceIn(1, MAX_PAUSE_GESTURE_SECONDS)
-                                ?: DEFAULT_PAUSE_GESTURE_SECONDS
-                            freeTriggerFloating.pauseTriggerTemporarily(
-                                triggerConfig.tag,
-                                seconds * 1000L,
-                                triggerConfig.name
-                            )
+                            ActionProxy(context, action?.firstStageLink ?: "")
+                                .execute(sourceTriggerTag = triggerConfig.tag)
                         }
 
                         GestureActionType.CLICK_THROUGH -> {
@@ -540,7 +533,7 @@ class GestureManager(
         }
     }
 
-    private fun refreshOverlayThemes() {
+    fun refreshOverlayThemes() {
         if (guidePreviewFloatingLazy.isInitialized()) guidePreviewFloating.refresh()
         if (actionViewFloatingLazy.isInitialized()) actionViewFloating.refreshTheme()
         if (notificationFloatingLazy.isInitialized()) notificationFloating.refreshTheme()
