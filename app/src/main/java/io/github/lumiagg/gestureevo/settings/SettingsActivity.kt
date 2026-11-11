@@ -106,20 +106,6 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
         private var preferenceService: Preference? = null
 
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            setDivider(null)
-            listView.clipToPadding = false
-            val initialBottom = listView.paddingBottom
-            ViewCompat.setOnApplyWindowInsetsListener(listView) { list, insets ->
-                val bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
-                list.setPadding(list.paddingLeft, list.paddingTop, list.paddingRight,
-                    initialBottom + bottom + (16 * resources.displayMetrics.density).toInt())
-                insets
-            }
-            ViewCompat.requestApplyInsets(listView)
-        }
-
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             preferenceManager.preferenceDataStore =
                 PreferenceDataStoreAdapter(requireContext().settingsStore, lifecycleScope)
@@ -261,6 +247,7 @@ class SettingsActivity : AppCompatActivity() {
 
         override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
+            setDivider(null)
             // Round 2 insets fix: the home list previously used a fixed 28dp
             // bottom spacer, which is less than the 3-button navigation bar
             // height — the last card group could slide under the transparent
