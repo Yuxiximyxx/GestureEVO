@@ -52,7 +52,7 @@
                             android:layout_weight="1"
                             android:text="@string/action_config_item_diameter"
                             android:textAppearance="?attr/textAppearanceTitleSmall"
-                            android:textColor="?attr/colorOnSurface" />
+                            android:textColor="@color/miuix_text_primary" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/itemDiameterValue"
@@ -61,7 +61,7 @@
                             android:gravity="end"
                             android:minWidth="48dp"
                             android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorPrimary" />
+                            android:textColor="@color/miuix_accent" />
                     </LinearLayout>
 
                     <com.google.android.material.slider.Slider
@@ -95,7 +95,7 @@
                             android:layout_weight="1"
                             android:text="@string/action_config_init_radius"
                             android:textAppearance="?attr/textAppearanceTitleSmall"
-                            android:textColor="?attr/colorOnSurface" />
+                            android:textColor="@color/miuix_text_primary" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/initRadiusValue"
@@ -104,7 +104,7 @@
                             android:gravity="end"
                             android:minWidth="48dp"
                             android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorPrimary" />
+                            android:textColor="@color/miuix_accent" />
                     </LinearLayout>
 
                     <com.google.android.material.slider.Slider
@@ -138,7 +138,7 @@
                             android:layout_weight="1"
                             android:text="@string/action_config_item_warp_offset"
                             android:textAppearance="?attr/textAppearanceTitleSmall"
-                            android:textColor="?attr/colorOnSurface" />
+                            android:textColor="@color/miuix_text_primary" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/itemWarpOffsetValue"
@@ -147,7 +147,7 @@
                             android:gravity="end"
                             android:minWidth="48dp"
                             android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorPrimary" />
+                            android:textColor="@color/miuix_accent" />
                     </LinearLayout>
 
                     <com.google.android.material.slider.Slider
@@ -181,7 +181,7 @@
                             android:layout_weight="1"
                             android:text="@string/action_config_icon_padding"
                             android:textAppearance="?attr/textAppearanceTitleSmall"
-                            android:textColor="?attr/colorOnSurface" />
+                            android:textColor="@color/miuix_text_primary" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/iconPaddingValue"
@@ -190,7 +190,7 @@
                             android:gravity="end"
                             android:minWidth="48dp"
                             android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorPrimary" />
+                            android:textColor="@color/miuix_accent" />
                     </LinearLayout>
 
                     <com.google.android.material.slider.Slider
@@ -224,7 +224,7 @@
                             android:layout_weight="1"
                             android:text="@string/action_config_icon_corner_radius"
                             android:textAppearance="?attr/textAppearanceTitleSmall"
-                            android:textColor="?attr/colorOnSurface" />
+                            android:textColor="@color/miuix_text_primary" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/iconCornerRadiusValue"
@@ -233,7 +233,7 @@
                             android:gravity="end"
                             android:minWidth="48dp"
                             android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorPrimary" />
+                            android:textColor="@color/miuix_accent" />
                     </LinearLayout>
 
                     <com.google.android.material.slider.Slider
@@ -268,7 +268,7 @@
                         android:layout_weight="1"
                         android:text="@string/action_config_icon_image_round_percent"
                         android:textAppearance="?attr/textAppearanceTitleSmall"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:textColor="@color/miuix_text_primary" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/iconImageRoundPercentValue"
@@ -277,7 +277,7 @@
                         android:gravity="end"
                         android:minWidth="48dp"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
-                        android:textColor="?attr/colorPrimary" />
+                        android:textColor="@color/miuix_accent" />
                 </LinearLayout>
 
                 <com.google.android.material.slider.Slider
@@ -312,7 +312,7 @@
                         android:layout_weight="1"
                         android:text="@string/action_config_offset_x"
                         android:textAppearance="?attr/textAppearanceTitleSmall"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:textColor="@color/miuix_text_primary" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/offsetXValue"
@@ -321,7 +321,7 @@
                         android:gravity="end"
                         android:minWidth="48dp"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
-                        android:textColor="?attr/colorPrimary" />
+                        android:textColor="@color/miuix_accent" />
                 </LinearLayout>
 
                 <com.google.android.material.slider.Slider
@@ -356,7 +356,7 @@
                         android:layout_weight="1"
                         android:text="@string/action_config_offset_y"
                         android:textAppearance="?attr/textAppearanceTitleSmall"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:textColor="@color/miuix_text_primary" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/offsetYValue"
@@ -365,7 +365,7 @@
                         android:gravity="end"
                         android:minWidth="48dp"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
-                        android:textColor="?attr/colorPrimary" />
+                        android:textColor="@color/miuix_accent" />
                 </LinearLayout>
 
                 <com.google.android.material.slider.Slider
@@ -425,7 +425,7 @@
                         android:layout_weight="1"
                         android:text="@string/action_config_rectangle_columns"
                         android:textAppearance="?attr/textAppearanceTitleSmall"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:textColor="@color/miuix_text_primary" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/rectangleColumnsValue"
@@ -434,7 +434,7 @@
                         android:gravity="end"
                         android:minWidth="48dp"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
-                        android:textColor="?attr/colorPrimary" />
+                        android:textColor="@color/miuix_accent" />
                 </LinearLayout>
 
                 <com.google.android.material.slider.Slider

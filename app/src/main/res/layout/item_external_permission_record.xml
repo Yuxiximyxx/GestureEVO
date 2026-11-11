@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="?android:textColorSecondary" />
+            android:textColor="@color/miuix_text_secondary" />
 
         <TextView
             android:id="@+id/recordLink"
@@ -34,7 +34,7 @@
             android:ellipsize="end"
             android:fontFamily="monospace"
             android:maxLines="2"
-            android:textColor="?android:textColorSecondary"
+            android:textColor="@color/miuix_text_secondary"
             android:textIsSelectable="false" />
 
         <LinearLayout

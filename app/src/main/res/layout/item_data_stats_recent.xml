@@ -13,7 +13,7 @@
         android:layout_weight="1"
         android:maxLines="1"
         android:ellipsize="end"
-        android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+        android:textAppearance="@style/TextAppearance.GestureEVO.MiuixRowTitle" />
 
     <TextView
         android:id="@+id/recentItemTimeText"
@@ -21,5 +21,5 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-        android:textColor="?attr/colorOnSurfaceVariant" />
+        android:textColor="@color/miuix_text_secondary" />
 </LinearLayout>

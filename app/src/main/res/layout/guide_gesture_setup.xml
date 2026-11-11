@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/miuix_page_bg"
     android:orientation="vertical">
 
     <TextView
@@ -72,7 +73,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:textColor="?attr/colorOnSurfaceVariant" />
+        android:textColor="@color/miuix_text_secondary" />
 
     <com.google.android.material.slider.Slider
         android:id="@+id/positionSlider"
@@ -98,7 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:textColor="?attr/colorOnSurfaceVariant" />
+        android:textColor="@color/miuix_text_secondary" />
 
     <com.google.android.material.slider.Slider
         android:id="@+id/heightSlider"

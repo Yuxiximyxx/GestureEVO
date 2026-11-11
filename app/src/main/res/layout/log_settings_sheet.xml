@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:text="@string/log_detailed_hint"
             android:textAppearance="?attr/textAppearanceBodySmall"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            android:textColor="@color/miuix_text_secondary" />
 
         <TextView
             android:layout_width="match_parent"
@@ -43,7 +43,7 @@
             android:layout_marginTop="24dp"
             android:text="@string/log_capture_idle"
             android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            android:textColor="@color/miuix_text_secondary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/doneButton"

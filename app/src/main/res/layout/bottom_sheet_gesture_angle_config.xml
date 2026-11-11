@@ -25,7 +25,7 @@
                 android:layout_weight="1"
                 android:text="@string/gesture_angle_config_title"
                 android:textAppearance="?attr/textAppearanceTitleLarge"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="@color/miuix_text_primary" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_reset"
@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/gesture_angle_section_title"
                 android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="@color/miuix_text_primary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -68,7 +68,7 @@
                 android:layout_marginTop="2dp"
                 android:text="@string/gesture_angle_section_desc"
                 android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:textColor="@color/miuix_text_secondary" />
 
             <io.github.lumiagg.gestureevo.settings.ui.GestureAngleDialView
                 android:id="@+id/angle_dial_view"

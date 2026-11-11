@@ -8,5 +8,5 @@
     android:paddingTop="16dp"
     android:paddingBottom="4dp"
     android:textAppearance="?attr/textAppearanceLabelLarge"
-    android:textColor="?attr/colorOnSurfaceVariant"
+    android:textColor="@color/miuix_text_secondary"
     tools:text="滑动" />

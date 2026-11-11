@@ -23,6 +23,6 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textColor="@color/miuix_text_secondary"
         android:textSize="11sp" />
 </LinearLayout>

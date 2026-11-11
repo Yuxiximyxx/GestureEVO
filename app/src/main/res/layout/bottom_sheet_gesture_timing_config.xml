@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:text="@string/gesture_timing_section_title"
             android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textColor="?attr/colorOnSurface" />
+            android:textColor="@color/miuix_text_primary" />
 
         <TextView
             android:layout_width="match_parent"
@@ -56,7 +56,7 @@
             android:layout_marginTop="4dp"
             android:text="@string/gesture_timing_section_desc"
             android:textAppearance="?attr/textAppearanceBodySmall"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            android:textColor="@color/miuix_text_secondary" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/gesture_timing_long_press_title"
                 android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="@color/miuix_text_primary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -81,7 +81,7 @@
                 android:layout_marginTop="2dp"
                 android:text="@string/gesture_timing_long_press_desc"
                 android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:textColor="@color/miuix_text_secondary" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/longPressSlider"
@@ -108,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/gesture_timing_double_tap_title"
                 android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="@color/miuix_text_primary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -116,7 +116,7 @@
                 android:layout_marginTop="2dp"
                 android:text="@string/gesture_timing_double_tap_desc"
                 android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:textColor="@color/miuix_text_secondary" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/doubleTapSlider"
@@ -143,7 +143,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/gesture_timing_pause_title"
                 android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="@color/miuix_text_primary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -151,7 +151,7 @@
                 android:layout_marginTop="2dp"
                 android:text="@string/gesture_timing_pause_desc"
                 android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:textColor="@color/miuix_text_secondary" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/pauseSlider"
@@ -178,7 +178,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/gesture_timing_swipe_threshold_title"
                 android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="@color/miuix_text_primary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -186,7 +186,7 @@
                 android:layout_marginTop="2dp"
                 android:text="@string/gesture_timing_swipe_threshold_desc"
                 android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:textColor="@color/miuix_text_secondary" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/swipeThresholdSlider"
@@ -213,7 +213,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/gesture_timing_back_threshold_title"
                 android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="@color/miuix_text_primary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -221,7 +221,7 @@
                 android:layout_marginTop="2dp"
                 android:text="@string/gesture_timing_back_threshold_desc"
                 android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:textColor="@color/miuix_text_secondary" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/backThresholdSlider"

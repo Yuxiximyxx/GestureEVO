@@ -40,7 +40,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="?attr/textAppearanceTitleMedium"
-        android:textColor="?attr/colorOnSurface"
+        android:textColor="@color/miuix_text_primary"
         tools:text="应用" />
       <com.google.android.material.chip.Chip
         android:id="@+id/uploadInfo"
@@ -59,7 +59,7 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="8dp"
       android:textAppearance="?attr/textAppearanceBodyLarge"
-      android:textColor="?attr/colorPrimary"
+      android:textColor="@color/miuix_accent"
       tools:text="快捷方式" />
     <!-- 第三行：快捷方式描述 -->
     <TextView
@@ -70,7 +70,7 @@
       android:ellipsize="end"
       android:maxLines="2"
       android:textAppearance="?attr/textAppearanceBodyMedium"
-      android:textColor="?attr/colorOnSurfaceVariant"
+      android:textColor="@color/miuix_text_secondary"
       tools:text="介绍" />
     <!-- 第四行：URI展示（可选） -->
     <TextView
@@ -82,7 +82,7 @@
       android:fontFamily="monospace"
       android:maxLines="1"
       android:textAppearance="?attr/textAppearanceBodySmall"
-      android:textColor="?attr/colorOnSurfaceVariant"
+      android:textColor="@color/miuix_text_secondary"
       tools:text="链接"
       tools:visibility="visible" />
     <!-- 第五行：操作按钮（可选） -->

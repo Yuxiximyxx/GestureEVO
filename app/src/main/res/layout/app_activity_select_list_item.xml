@@ -32,7 +32,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="@color/miuix_text_primary" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/activityIsExport"
@@ -52,7 +52,7 @@
             android:layout_marginTop="4dp"
             android:ellipsize="end"
             android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            android:textColor="@color/miuix_text_secondary" />
 
     </LinearLayout>
 

@@ -23,7 +23,7 @@
             android:layout_weight="1"
             android:text="@string/gesture_type_select_title"
             android:textAppearance="?attr/textAppearanceHeadlineSmall"
-            android:textColor="?attr/colorOnSurface" />
+            android:textColor="@color/miuix_text_primary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/mode_batch"
@@ -43,7 +43,7 @@
         android:paddingBottom="8dp"
         android:text="@string/gesture_type_select_note"
         android:textAppearance="?attr/textAppearanceBodySmall"
-        android:textColor="?attr/colorOnSurfaceVariant" />
+        android:textColor="@color/miuix_text_secondary" />
 
     <LinearLayout
         android:id="@+id/batch_controls"
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:text="@string/gesture_type_batch_hint"
             android:textAppearance="?attr/textAppearanceBodySmall"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            android:textColor="@color/miuix_text_secondary" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/phaseChipGroup"
@@ -135,7 +135,7 @@
                 android:layout_weight="1"
                 android:gravity="end"
                 android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textColor="@color/miuix_text_secondary"
                 tools:text="已选 4 个手势，2 个阶段" />
         </LinearLayout>
 

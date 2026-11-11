@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textAppearance="?attr/textAppearanceTitleSmall"
-            android:textColor="?attr/colorOnSurface"
+            android:textColor="@color/miuix_text_primary"
             tools:text="向右滑动" />
     </LinearLayout>
 
@@ -46,7 +46,7 @@
         android:paddingBottom="4dp"
         android:text="@string/gesture_type_phase_locked"
         android:textAppearance="?attr/textAppearanceBodySmall"
-        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textColor="@color/miuix_text_secondary"
         android:visibility="gone"
         tools:visibility="visible" />
 

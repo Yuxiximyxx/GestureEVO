@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/action_items_tag_select_subtitle"
-        android:textColor="?android:textColorSecondary" />
+        android:textColor="@color/miuix_text_secondary" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pieGroupsRecyclerView"

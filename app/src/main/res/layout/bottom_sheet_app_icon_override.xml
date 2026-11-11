@@ -32,7 +32,7 @@
         android:paddingHorizontal="4dp"
         android:paddingBottom="12dp"
         android:textAppearance="?attr/textAppearanceBodySmall"
-        android:textColor="?attr/colorOnSurfaceVariant" />
+        android:textColor="@color/miuix_text_secondary" />
 
     <io.github.lumiagg.gestureevo.settings.ui.SettingsNavRow
         android:id="@+id/select_gallery"
