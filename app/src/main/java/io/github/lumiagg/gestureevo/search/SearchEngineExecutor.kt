@@ -1,18 +1,19 @@
 package io.github.lumiagg.gestureevo.search
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.github.lumiagg.gestureevo.R
 import io.github.lumiagg.gestureevo.gesture.EventBusManager.produceSearchEvent
 import io.github.lumiagg.gestureevo.gesture.SearchEvent
 import io.github.lumiagg.gestureevo.gesture.config.GestureActionType
 import io.github.lumiagg.gestureevo.inspire.InspireDataHolder
 import io.github.lumiagg.gestureevo.inspire.ManagedBitmap
 import io.github.lumiagg.gestureevo.share.ImageShareLauncher
-import io.github.lumiagg.gestureevo.search.SearchHistoryManager
+import io.github.lumiagg.gestureevo.search.config.SearchContentMode
 import io.github.lumiagg.gestureevo.search.config.EngineType
 import io.github.lumiagg.gestureevo.search.config.SearchEngine
 import io.github.lumiagg.gestureevo.utils.ActionProxy
@@ -21,7 +22,9 @@ import io.github.lumiagg.gestureevo.utils.app.isActivityExported
 import io.github.lumiagg.gestureevo.utils.uriBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
 
 
 class SearchEngineExecutor(
@@ -37,7 +40,8 @@ class SearchEngineExecutor(
     fun execute(
         query: String = "",
         bitmapHandle: ManagedBitmap? = null,
-        imageUris: List<Uri> = emptyList()
+        imageUris: List<Uri> = emptyList(),
+        onSearchStarting: () -> Boolean = { true }
     ) =
         activity.lifecycleScope.launch(uiDispatcher) {
             val triggerSide = if (activity is QuickSearchActivity) {
@@ -45,145 +49,178 @@ class SearchEngineExecutor(
             } else {
                 InspireDataHolder.triggerSide
             }
-            when (engine.engineType) {
-                EngineType.DIRECT_LINK -> {
-                    val pkg = engine.targetPackage ?: ""
-                    var searchUrl = engine.searchLink?.replace("%s", Uri.encode(query))
-                    searchUrl = searchUrl?.replace("%q", query)
-
-                    val link = uriBuilder(GestureActionType.OTHER_LINK)
-                        .appendQueryParameter("uri", searchUrl)
-                        .appendQueryParameter("pkg", pkg)
-                        .appendQueryParameter("freeform", freeFrom.toString())
-                        .appendQueryParameter("useCustomTabs", engine.useCustomTabs.toString())
-                        .apply {
-                            triggerSide?.let { appendQueryParameter("triggerSide", it) }
-                        }
-                        .build()
-                    ActionProxy(activity, link.toString()).execute(side = triggerSide)
-                }
-
-                EngineType.EXTERN_JUMP_LINK -> {
-                    val pkg = engine.targetPackage ?: ""
-                    val activityName = engine.targetActivity ?: ""
-                    val externLink = engine.externJumpLink ?: ""
-                    if (pkg.isEmpty() || externLink.isEmpty()) {
+            val resolvedMode = engine.resolveContentMode(
+                hasText = query.isNotBlank(),
+                hasImage = bitmapHandle?.bitmapOrNull != null || imageUris.isNotEmpty()
+            )
+            val mode = if (resolvedMode == SearchContentMode.ASK) {
+                chooseContentMode() ?: return@launch
+            } else {
+                resolvedMode
+            }
+            if (!onSearchStarting()) return@launch
+            when {
+                mode == SearchContentMode.IMAGE -> {
+                    if (!executeShareImageSearch(bitmapHandle, imageUris, triggerSide)) {
                         return@launch
                     }
-                    val link = uriBuilder(GestureActionType.OTHER_LINK)
-                        .appendQueryParameter("uri", externLink)
-                        .appendQueryParameter("pkg", engine.externJumpPackage)
-                        .appendQueryParameter("freeform", freeFrom.toString())
-                        .apply {
-                            triggerSide?.let { appendQueryParameter("triggerSide", it) }
+                }
+
+                else -> when (engine.engineType) {
+                    EngineType.DIRECT_LINK -> {
+                        val pkg = engine.targetPackage ?: ""
+                        var searchUrl = engine.searchLink?.replace("%s", Uri.encode(query))
+                        searchUrl = searchUrl?.replace("%q", query)
+
+                        val link = uriBuilder(GestureActionType.OTHER_LINK)
+                            .appendQueryParameter("uri", searchUrl)
+                            .appendQueryParameter("pkg", pkg)
+                            .appendQueryParameter("freeform", freeFrom.toString())
+                            .appendQueryParameter("useCustomTabs", engine.useCustomTabs.toString())
+                            .apply {
+                                triggerSide?.let { appendQueryParameter("triggerSide", it) }
+                            }
+                            .build()
+                        ActionProxy(activity, link.toString()).execute(side = triggerSide)
+                    }
+
+                    EngineType.EXTERN_JUMP_LINK -> {
+                        val pkg = engine.targetPackage ?: ""
+                        val activityName = engine.targetActivity ?: ""
+                        val externLink = engine.externJumpLink ?: ""
+                        if (pkg.isEmpty() || externLink.isEmpty()) {
+                            return@launch
                         }
-                        .build()
+                        val link = uriBuilder(GestureActionType.OTHER_LINK)
+                            .appendQueryParameter("uri", externLink)
+                            .appendQueryParameter("pkg", engine.externJumpPackage)
+                            .appendQueryParameter("freeform", freeFrom.toString())
+                            .apply {
+                                triggerSide?.let { appendQueryParameter("triggerSide", it) }
+                            }
+                            .build()
 
-                    ActionProxy(activity, link.toString()).execute(side = triggerSide)
+                        ActionProxy(activity, link.toString()).execute(side = triggerSide)
 
-                    produceSearchEvent(
-                        SearchEvent(
-                            InjectionTask(
-                                query = query,
-                                targetPackage = pkg,
-                                targetActivity = activityName,
-                                inputEnter = engine.autoInputEnter
+                        produceSearchEvent(
+                            SearchEvent(
+                                InjectionTask(
+                                    query = query,
+                                    targetPackage = pkg,
+                                    targetActivity = activityName,
+                                    inputEnter = engine.autoInputEnter
+                                )
                             )
                         )
-                    )
-                }
+                    }
 
-                EngineType.JUMP_TO_ACTIVITY -> {
-                    val pkg = engine.targetPackage ?: ""
-                    val activityName = engine.targetActivity ?: ""
-                    if (pkg.isEmpty() || activityName.isEmpty()) {
-                        return@launch
-                    }
-                    val intent = Intent().apply {
-                        component = ComponentName(pkg, activityName)
-                    }
-                    val uri = intent.toUri(Intent.URI_INTENT_SCHEME)
-                    val isExported = withContext(ioDispatcher) {
-                        isActivityExported(activity, pkg, activityName)
-                    }
-                    val link = uriBuilder(GestureActionType.OPEN_ACTIVITY)
-                        .appendQueryParameter("uri", uri)
-                        .appendQueryParameter("pkg", pkg)
-                        .appendQueryParameter("activityName", activityName)
-                        .appendQueryParameter(
-                            "isExported",
-                            isExported.toString()
-                        )
-                        .appendQueryParameter("freeform", freeFrom.toString())
-                        .apply {
-                            triggerSide?.let { appendQueryParameter("triggerSide", it) }
+                    EngineType.JUMP_TO_ACTIVITY -> {
+                        val pkg = engine.targetPackage ?: ""
+                        val activityName = engine.targetActivity ?: ""
+                        if (pkg.isEmpty() || activityName.isEmpty()) {
+                            return@launch
                         }
-                        .build()
+                        val intent = Intent().apply {
+                            component = ComponentName(pkg, activityName)
+                        }
+                        val uri = intent.toUri(Intent.URI_INTENT_SCHEME)
+                        val isExported = withContext(ioDispatcher) {
+                            isActivityExported(activity, pkg, activityName)
+                        }
+                        val link = uriBuilder(GestureActionType.OPEN_ACTIVITY)
+                            .appendQueryParameter("uri", uri)
+                            .appendQueryParameter("pkg", pkg)
+                            .appendQueryParameter("activityName", activityName)
+                            .appendQueryParameter(
+                                "isExported",
+                                isExported.toString()
+                            )
+                            .appendQueryParameter("freeform", freeFrom.toString())
+                            .apply {
+                                triggerSide?.let { appendQueryParameter("triggerSide", it) }
+                            }
+                            .build()
 
-                    ActionProxy(activity, link.toString()).execute(side = triggerSide)
+                        ActionProxy(activity, link.toString()).execute(side = triggerSide)
 
-                    produceSearchEvent(
-                        SearchEvent(
-                            InjectionTask(
-                                query = query,
-                                targetPackage = pkg,
-                                targetActivity = activityName,
-                                inputEnter = engine.autoInputEnter
+                        produceSearchEvent(
+                            SearchEvent(
+                                InjectionTask(
+                                    query = query,
+                                    targetPackage = pkg,
+                                    targetActivity = activityName,
+                                    inputEnter = engine.autoInputEnter
+                                )
                             )
                         )
-                    )
-                }
-
-                EngineType.SHARE_TO_APP -> {
-                    val pkg = engine.targetPackage ?: return@launch
-
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, query)
-                        if (!engine.targetActivity.isNullOrEmpty()) {
-                            setClassName(pkg, engine.targetActivity ?: "")
-                        } else {
-                            setPackage(pkg)
-                        }
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
 
-                    val uri = shareIntent.toUri(Intent.URI_INTENT_SCHEME)
-                    val link = uriBuilder(GestureActionType.OTHER_LINK)
-                        .appendQueryParameter("uri", uri)
-                        .appendQueryParameter("pkg", pkg)
-                        .appendQueryParameter("freeform", freeFrom.toString())
-                        .apply {
-                            triggerSide?.let { appendQueryParameter("triggerSide", it) }
+                    EngineType.SHARE_TO_APP -> {
+                        val pkg = engine.targetPackage ?: return@launch
+
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, query)
+                            if (!engine.targetActivity.isNullOrEmpty()) {
+                                setClassName(pkg, engine.targetActivity ?: "")
+                            } else {
+                                setPackage(pkg)
+                            }
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         }
-                        .build()
 
-                    ActionProxy(activity, link.toString()).execute(side = triggerSide)
-                }
+                        val uri = shareIntent.toUri(Intent.URI_INTENT_SCHEME)
+                        val link = uriBuilder(GestureActionType.OTHER_LINK)
+                            .appendQueryParameter("uri", uri)
+                            .appendQueryParameter("pkg", pkg)
+                            .appendQueryParameter("freeform", freeFrom.toString())
+                            .apply {
+                                triggerSide?.let { appendQueryParameter("triggerSide", it) }
+                            }
+                            .build()
 
-                EngineType.SHARE_IMAGE_TO_APP -> {
-                    if (!executeShareImageSearch(bitmapHandle, imageUris, query, triggerSide)) {
-                        return@launch
+                        ActionProxy(activity, link.toString()).execute(side = triggerSide)
                     }
+
+                    // Pure image engines always take the image branch above.
+                    else -> Unit
                 }
             }
             executedAfterSearch(query)
         }
 
+    private suspend fun chooseContentMode(): SearchContentMode? = suspendCancellableCoroutine { continuation ->
+        val modes = arrayOf(SearchContentMode.TEXT, SearchContentMode.IMAGE)
+        val labels = arrayOf(
+            activity.getString(R.string.search_content_mode_text),
+            activity.getString(R.string.search_content_mode_image)
+        )
+        val dialog = MaterialAlertDialogBuilder(activity)
+            .setTitle(R.string.search_content_mode_title)
+            .setItems(labels) { _, which ->
+                if (continuation.isActive) continuation.resume(modes[which])
+            }
+            .setOnDismissListener {
+                if (continuation.isActive) continuation.resume(null)
+            }
+            .create()
+        continuation.invokeOnCancellation { dialog.dismiss() }
+        if (continuation.isActive) dialog.show()
+    }
+
     private suspend fun executeShareImageSearch(
         bitmapHandle: ManagedBitmap?,
         imageUris: List<Uri>,
-        query: String,
         triggerSide: String? = null
     ): Boolean {
-        val pkg = engine.targetPackage ?: return false
+        val pkg = engine.imageShareTargetPackage() ?: return false
         val result = when {
             imageUris.isNotEmpty() -> {
                 imageShareLauncher.launchForSearchEngine(
                     activity = activity,
                     imageUris = imageUris,
                     targetPackage = pkg,
-                    targetActivity = engine.targetActivity,
+                    targetActivity = engine.imageShareTargetActivity(),
                     freeform = freeFrom,
                     triggerSide = triggerSide
                 )
@@ -195,7 +232,7 @@ class SearchEngineExecutor(
                         activity = activity,
                         bitmap = handle.requireBitmap(),
                         targetPackage = pkg,
-                        targetActivity = engine.targetActivity,
+                        targetActivity = engine.imageShareTargetActivity(),
                         freeform = freeFrom,
                         triggerSide = triggerSide
                     )
@@ -212,12 +249,8 @@ class SearchEngineExecutor(
         }
 
         return when (result) {
-            ImageShareLauncher.LaunchResult.SUCCESS -> {
-                if (!freeFrom) {
-                    executedAfterSearch(query)
-                }
-                true
-            }
+            ImageShareLauncher.LaunchResult.SUCCESS -> true
+            ImageShareLauncher.LaunchResult.UNFREEZE_FAILED -> false
 
             ImageShareLauncher.LaunchResult.TARGET_NOT_FOUND -> {
                 ToastHelper.showInUIThread(
