@@ -17,9 +17,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.UserHandle
 import android.os.UserManager
 import android.provider.Settings
-import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.browser.customtabs.CustomTabsService
 import androidx.core.net.toUri
@@ -60,6 +60,9 @@ import io.github.lumiagg.gestureevo.utils.app.AShell
 import io.github.lumiagg.gestureevo.utils.app.AShizuku
 import io.github.lumiagg.gestureevo.utils.app.AShizuku.ensureAppEnabledIfFrozen
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -86,6 +89,23 @@ class ActionProxy(private val context: Context, linkString: String) {
     val triggerSideParam: String? = link.getQueryParameter("triggerSide")
 
     suspend fun execute(anchor: TriggerSide.Point? = null, side: String? = null, sourceTriggerTag: String? = null) {
+        executeTracked(anchor, side) { executeAction(sourceTriggerTag) }
+    }
+
+    /** Executes OTHER_LINK/OTHER_SHORTCUT through the regular launcher and reports submission. */
+    suspend fun executeLink(anchor: TriggerSide.Point? = null, side: String? = null): Boolean {
+        require(event == GestureActionType.OTHER_LINK || event == GestureActionType.OTHER_SHORTCUT)
+        return executeTracked(anchor, side) {
+            val uri = otherLink ?: return@executeTracked false
+            launchUri(uri, pkg.orEmpty())
+        }
+    }
+
+    private suspend fun <T> executeTracked(
+        anchor: TriggerSide.Point?,
+        side: String?,
+        action: suspend () -> T,
+    ): T {
         val startedAt = android.os.SystemClock.elapsedRealtime()
         SystemLogCapture.rememberTarget(pkg)
         AppLogger.event(LogModule.ACTION, "action_triggered", trace = trace,
@@ -99,9 +119,10 @@ class ActionProxy(private val context: Context, linkString: String) {
             TriggerSide.record(effectiveSide)
         }
         try {
-            executeAction(sourceTriggerTag)
+            val result = action()
             AppLogger.event(LogModule.ACTION, "action_dispatch_returned", trace = trace,
                 fields = mapOf("durationMs" to android.os.SystemClock.elapsedRealtime() - startedAt))
+            return result
         } catch (e: kotlinx.coroutines.CancellationException) {
             AppLogger.event(LogModule.ACTION, "action_cancelled", LogLevel.WARN, trace)
             throw e
@@ -396,11 +417,29 @@ class ActionProxy(private val context: Context, linkString: String) {
             val launcherApps =
                 context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
             try {
+                // Action links store user serial numbers, not Android user IDs.
+                val targetUser = userManager.getUserForSerialNumber(userId)
+                if (!freeform && Rom.isOriginOS() && componentName != null &&
+                    targetUser == UserHandle.getUserHandleForUid(999 * 100000)
+                ) {
+                    val cloneIntent = Intent(Intent.ACTION_MAIN).apply {
+                        addCategory(Intent.CATEGORY_LAUNCHER)
+                        component = componentName
+                        addFlags(FLAG_ACTIVITY_NEW_TASK)
+                        // Route to the selected clone without invoking vivo's picker.
+                        putExtra("android.intent.extra.from_share_box", true)
+                        putExtra("android.intent.extra.clone_cached_userId", 999)
+                        putExtra("clone_cross_state", true)
+                    }
+                    AppLogger.event(LogModule.ACTION, "vivo_clone_launch_requested", trace = trace,
+                        fields = mapOf("method" to "vivo_clone", "component" to componentName.flattenToShortString()))
+                    return@withContext launchIntent(cloneIntent)
+                }
                 AppLogger.event(LogModule.ACTION, "launch_requested", trace = trace,
                     fields = mapOf("method" to "work_profile", "component" to componentName?.flattenToShortString()))
                 launcherApps.startMainActivity(
                     componentName,
-                    userManager.getUserForSerialNumber(userId),
+                    targetUser,
                     null,
                     if (freeform) getActivityOptions().toBundle() else null
                 )
@@ -431,7 +470,12 @@ class ActionProxy(private val context: Context, linkString: String) {
             try {
                 if (freeform) {
                     when (getFreeFormCode(context)) {
-                        RomFreeFormCode.VIVO.code -> shareOpenIntent(intent)
+                        RomFreeFormCode.VIVO.code -> {
+                            if (!shareOpenIntent(intent).success) {
+                                AppLogger.event(LogModule.ACTION, "launch_failed", LogLevel.WARN, trace, fields = metadata)
+                                return@withContext false
+                            }
+                        }
                         RomFreeFormCode.NUBIA.code -> startNubiaFreeformActivity(context, intent)
                         else -> context.startActivity(intent, getActivityOptions().toBundle())
                     }
@@ -497,13 +541,38 @@ class ActionProxy(private val context: Context, linkString: String) {
         timeoutMillis: Long = 10_000L  // 10-second timeout
     ): ShareOpenResult {
         val requestId = UUID.randomUUID().toString()
+        val mainUserAppLaunch = userId == 0L &&
+            (event == GestureActionType.OPEN_APP || event == GestureActionType.RECENT_APP) &&
+            targetIntent.action == Intent.ACTION_MAIN &&
+            targetIntent.hasCategory(Intent.CATEGORY_LAUNCHER) && targetIntent.component != null
+        val shareTarget = Intent(targetIntent)
+        if (mainUserAppLaunch) {
+            // Vivo's clone resolver skips its picker when the explicit target user
+            // matches the launch user. This is a ROM Intent field, not an extra.
+            try {
+                try {
+                    Intent::class.java.getMethod("setTargetUserId", Int::class.javaPrimitiveType)
+                        .invoke(shareTarget, 0)
+                } catch (_: NoSuchMethodException) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) throw NoSuchMethodException("setTargetUserId")
+                    HiddenApiBypass.invoke(Intent::class.java, shareTarget, "setTargetUserId", 0)
+                }
+                AppLogger.event(LogModule.ACTION, "vivo_share_target_user_applied", trace = trace,
+                    fields = mapOf("component" to shareTarget.component?.flattenToShortString(),
+                        "method" to "setTargetUserId", "count" to 0))
+            } catch (e: Exception) {
+                // Older ROMs can keep using the existing system picker.
+                AppLogger.event(LogModule.ACTION, "vivo_share_target_user_unavailable", LogLevel.WARN,
+                    trace = trace, error = e)
+            }
+        }
 
         val intent = Intent(Intent.ACTION_SEND).apply {
             component = ComponentName(context, ShareOpenAppProxyActivity::class.java)
             type = "text/plain"
             putExtra("REQUEST_ID", requestId)
-            putExtra(Intent.EXTRA_INTENT, targetIntent)
-            putExtra(Intent.EXTRA_TEXT, targetIntent.`package`)
+            putExtra(Intent.EXTRA_INTENT, shareTarget)
+            putExtra(Intent.EXTRA_TEXT, targetIntent.`package` ?: targetIntent.component?.packageName)
             addFlags(FLAG_ACTIVITY_NEW_TASK)
         }
 
@@ -511,16 +580,18 @@ class ActionProxy(private val context: Context, linkString: String) {
             addFlags(FLAG_ACTIVITY_NEW_TASK)
         }
 
-        context.startActivity(chooser)
-
-        // Await result with timeout
-        return withTimeoutOrNull(timeoutMillis) {
-            ShareOpenResultManager.awaitResult(requestId)
-        } ?: ShareOpenResult(
-            requestId = requestId,
-            success = false,
-            data = null
-        )
+        return coroutineScope {
+            // Subscribe before starting the activity: the result flow has no replay buffer.
+            val result = async(start = CoroutineStart.UNDISPATCHED) {
+                withTimeoutOrNull(timeoutMillis) { ShareOpenResultManager.awaitResult(requestId) }
+            }
+            try {
+                context.startActivity(chooser)
+                result.await() ?: ShareOpenResult(requestId, success = false)
+            } finally {
+                result.cancel()
+            }
+        }
     }
 
     suspend fun launchTemporaryAssistant(context: Context, pkg: String, activity: String): Boolean =

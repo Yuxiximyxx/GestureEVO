@@ -12,6 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.WindowManager
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityWindowInfo
 import android.widget.Toast
 import io.github.lumiagg.gestureevo.R
 import io.github.lumiagg.gestureevo.gesture.GestureManager.InteractionMode
@@ -25,6 +27,7 @@ import io.github.lumiagg.gestureevo.settings.InspireSettingsActivity.Companion.K
 import io.github.lumiagg.gestureevo.settings.InspireSettingsActivity.Companion.KEY_DEFAULT_SHARE_IMAGE_APP
 import io.github.lumiagg.gestureevo.settings.InspireSettingsActivity.Companion.KEY_INSPIRE_SELECTION_VIBRATE
 import io.github.lumiagg.gestureevo.settings.InspireSettingsActivity.Companion.KEY_INSPIRE_EDGE_BACK
+import io.github.lumiagg.gestureevo.settings.InspireSettingsActivity.Companion.KEY_SCREEN_CONTENT_LINK_RADAR
 import io.github.lumiagg.gestureevo.share.ImageShareLauncher
 import io.github.lumiagg.gestureevo.utils.ClipboardUtils
 import io.github.lumiagg.gestureevo.utils.MlKitOcr
@@ -36,7 +39,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,6 +50,18 @@ class InspireFloating(private val context: GestureService) :
     private val inspireView: InspireView by lazy {
         val themeContext: Context = ContextThemeWrapper(context, R.style.Theme_GestureEVO)
         InspireViewBinding.inflate(LayoutInflater.from(themeContext)).root
+    }
+
+    private val linkRadarLazy = lazy {
+        ScreenContentLinkRadar(context, inspireView.linkRadarView) { hide() }
+    }
+
+    fun cancelLinkRadar() {
+        if (linkRadarLazy.isInitialized()) linkRadarLazy.value.stop()
+    }
+
+    fun onWindowEvent(event: AccessibilityEvent) {
+        if (linkRadarLazy.isInitialized()) linkRadarLazy.value.onWindowEvent(event)
     }
 
     private val layoutParams: WindowManager.LayoutParams = WindowManager.LayoutParams()
@@ -110,6 +124,18 @@ class InspireFloating(private val context: GestureService) :
         inspireView.inspireViewCallBack = object : InspireViewCallBack {
             var taskJob: Job? = null
             var lastLongPressUptimeMs = 0L
+            override fun onLinkTouchDown(x: Float, y: Float): Boolean =
+                linkRadarLazy.isInitialized() && linkRadarLazy.value.press(x, y)
+
+            override fun onLinkTouchUp(x: Float, y: Float): Boolean =
+                linkRadarLazy.isInitialized() && linkRadarLazy.value.release(x, y)
+
+            override fun onLinkTouchCancel() {
+                if (linkRadarLazy.isInitialized()) linkRadarLazy.value.cancelPress()
+            }
+
+            override fun onLinkSelectionStarted() = cancelLinkRadar()
+
             override fun onSessionCaptureRequested(onCaptured: () -> Unit) {
                 requestSessionScreenshot(onCaptured)
             }
@@ -132,7 +158,7 @@ class InspireFloating(private val context: GestureService) :
                     return
                 }
                 taskJob = context.launch {
-                    val targetRect = resolveTargetRect(dragSelectRect) ?: dragSelectRect
+                    val targetRect = resolveScreenContentRect(context, dragSelectRect) ?: dragSelectRect
                     processScreenContent(targetRect)
                 }
             }
@@ -292,6 +318,7 @@ class InspireFloating(private val context: GestureService) :
     }
 
     private fun invalidateSessionCapture() {
+        cancelLinkRadar()
         sessionGeneration += 1
         resetTextBoxPreview()
         sessionCaptureJob?.cancel()
@@ -529,41 +556,6 @@ class InspireFloating(private val context: GestureService) :
         return Rect(this).takeIf { it.intersect(selection) && !it.isEmpty }
     }
 
-    private suspend fun resolveTargetRect(dragSelectRect: Rect): Rect? =
-        withContext(Dispatchers.Default) {
-            val tooSmallWidth = inspireView.rectTooSmallWidth(dragSelectRect)
-            val tooSmallHeight = inspireView.rectTooSmallHeight(dragSelectRect)
-            when {
-                tooSmallWidth && tooSmallHeight -> {
-                    val intersectingViews = getScreenView(context, dragSelectRect, clickMode = true)
-                    intersectingViews
-                        .filter { it.area > dragSelectRect.height() * dragSelectRect.width() * 1.2 }
-                        .minByOrNull { it.area }?.bound
-                }
-
-                tooSmallHeight || tooSmallWidth -> {
-                    val views = getScreenView(context, dragSelectRect, clickMode = false)
-                    if (views.isEmpty()) {
-                        null
-                    } else {
-                        val expandedRect = Rect()
-                        var isFirst = true
-                        views.forEach { view ->
-                            if (isFirst) {
-                                expandedRect.set(view.bound)
-                                isFirst = false
-                            } else {
-                                expandedRect.union(view.bound)
-                            }
-                        }
-                        expandedRect
-                    }
-                }
-
-                else -> dragSelectRect
-            }
-        }
-
     private suspend fun recoverInspireState() = withContext(Dispatchers.Main) {
         context.gestureManager?.setInteractionMode(InteractionMode.NORMAL)
         inspireView.stopTransitionAnimation()
@@ -588,27 +580,17 @@ class InspireFloating(private val context: GestureService) :
                 resetTransitionState()
                 scheduleTransition(startUptimeMs)
 
-                val accessibilityJob = async {
-                    getScreenContentText(context, dragSelectRect)
-                }
-
-                val takeScreenshotJob = async {
-                    captureFreshScreenshot()?.use { screenshotHandle ->
-                        val croppedBitmap =
-                            screenshotHandle.cropByRect(dragSelectRect) ?: return@async
-                        InspireDataHolder.replaceScreenshotBitmap(croppedBitmap)
-                        PinPoolStore.addScreenContentImageIfEnabled(
-                            context,
-                            croppedBitmap.requireBitmap()
-                        )
-                        croppedBitmap.close()
+                val content = captureScreenContent(context, dragSelectRect, ::captureFreshScreenshot)
+                    ?: error("Screen content selection unavailable")
+                content.use {
+                    InspireDataHolder.accessibilityContent = it.accessibilityText
+                    InspireDataHolder.replaceScreenshotBitmap(it.image)
+                    it.image?.let { image ->
+                        PinPoolStore.addScreenContentImageIfEnabled(context, image.requireBitmap())
                         screenshotDone = true
                         maybeStartTransitionAfterScreenshot(startUptimeMs)
                     }
                 }
-
-                InspireDataHolder.accessibilityContent = accessibilityJob.await()
-                takeScreenshotJob.await()
                 InspireDataHolder.replaceOcrAllowedTextBoxes(null)
 
                 InspireDataHolder.dragRect = Rect()
@@ -660,6 +642,8 @@ class InspireFloating(private val context: GestureService) :
     }
 
     private fun launchInspireContentActivity() {
+        val source = io.github.lumiagg.gestureevo.utils.CurrentPackageProvider.resolveCurrentPackageName()
+        if (source != null && source != context.packageName) InspireDataHolder.sourcePackage = source
         activityLaunching = true
         cancelTransition()
         InspireContentActivity.start(context)
@@ -734,10 +718,26 @@ class InspireFloating(private val context: GestureService) :
         inspireView.showScreenShotFab(screenshotFabVisibility)
     }
 
+    @Suppress("DEPRECATION")
+    private fun sourceApplicationWindowId(): Int? {
+        val windows = context.windows
+        return try {
+            windows.filter { it.type == AccessibilityWindowInfo.TYPE_APPLICATION && (it.isActive || it.isFocused) }
+                .maxByOrNull { it.layer }?.id
+        } finally {
+            windows.forEach { it.recycle() }
+        }
+    }
+
     fun show(forceImageTextSelection: Boolean = false, side: String? = null) {
         context.postOnMain {
             resetSessionCapture()
             sessionTriggerSide = side
+            val generation = sessionGeneration
+            val radarEnabled = context.settingsStore.readKey(KEY_SCREEN_CONTENT_LINK_RADAR, false)
+            if (generation != sessionGeneration) return@postOnMain
+            val sourceWindow = if (radarEnabled) sourceApplicationWindowId() else null
+            if (sourceWindow != null) linkRadarLazy.value.start(sourceWindow, side)
             prepareScreenContentSelector(forceImageTextSelection, View.VISIBLE)
         }
     }

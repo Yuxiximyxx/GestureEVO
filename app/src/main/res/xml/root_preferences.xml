@@ -49,6 +49,14 @@
         android:title="@string/settings_features_title" />
 
     <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
+        android:icon="@drawable/link_20px"
+        android:key="preferenceLink"
+        app:miuixGlyphColor="@color/miuix_tile_blue_fg"
+        app:miuixTileColor="@color/miuix_tile_blue_bg"
+        android:summary="@string/link_settings_summary"
+        android:title="@string/link_settings_title" />
+
+    <io.github.lumiagg.gestureevo.settings.ui.HomeEntryPreference
         android:icon="@drawable/search_24px"
         android:key="preferenceSearch"
         app:miuixGlyphColor="@color/miuix_tile_blue_fg"

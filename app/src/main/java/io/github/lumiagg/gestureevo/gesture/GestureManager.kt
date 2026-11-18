@@ -30,6 +30,8 @@ import io.github.lumiagg.gestureevo.gesture.ui.TriggerCallBack
 import io.github.lumiagg.gestureevo.gesture.ui.TriggerView
 import io.github.lumiagg.gestureevo.inspire.InspireFloating
 import io.github.lumiagg.gestureevo.inspire.PictureFloating
+import io.github.lumiagg.gestureevo.pointer.radar.LinkRadarOverlay
+import io.github.lumiagg.gestureevo.pointer.radar.PointerLinkCapture
 import io.github.lumiagg.gestureevo.notification.NotificationFloating
 import io.github.lumiagg.gestureevo.notification.NotificationService
 import io.github.lumiagg.gestureevo.pin.PinPoolFloating
@@ -39,6 +41,7 @@ import io.github.lumiagg.gestureevo.screen_search.ScreenSearchFloating
 import io.github.lumiagg.gestureevo.search.AutomatePerformer
 import io.github.lumiagg.gestureevo.settings.ActionViewSettingsActivity.Companion.KEY_DISABLE_ALL_WHEEL_VIBRATE
 import io.github.lumiagg.gestureevo.settings.ActionViewSettingsActivity.Companion.KEY_MAIN_SHOW_VIBRATE
+import io.github.lumiagg.gestureevo.pointer.radar.LinkRadarPreferences
 import io.github.lumiagg.gestureevo.settings.guide.GuidePreviewSession
 import io.github.lumiagg.gestureevo.utils.ActionProxy
 import io.github.lumiagg.gestureevo.utils.CurrentPackageProvider
@@ -78,12 +81,31 @@ class GestureManager(
     private val pointerFloatingLazy = lazy { PointerFloating(gestureService) }
     private val pointerFloating: PointerFloating
         get() = pointerFloatingLazy.value
+    private val pointerLinks = PointerLinkCapture(gestureService, lifecycleScope)
     private val notificationFloatingLazy = lazy { NotificationFloating(gestureService) }
     private val notificationFloating: NotificationFloating
         get() = notificationFloatingLazy.value
     private val screenSearchFloatingLazy = lazy { ScreenSearchFloating(gestureService) }
     private val screenSearchFloating: ScreenSearchFloating
         get() = screenSearchFloatingLazy.value
+    private val linkRadarFloatingLazy = lazy {
+        LinkRadarOverlay(
+            gestureService,
+            pointerStateProvider = {
+                // The radar yields throughout drag selection and hover menu interaction.
+                if (pointerFloatingLazy.isInitialized() && !pointerFloating.isPointerDragMode &&
+                    !pointerFloating.isHoverInteractionActive) {
+                    pointerFloating.currentPointerSnapshot()
+                } else null
+            },
+            triggerSideProvider = {
+                if (pointerFloatingLazy.isInitialized()) pointerFloating.triggerSide else null
+            },
+            captureLinks = { pointerLinks.get() },
+        )
+    }
+    private val linkRadarFloating: LinkRadarOverlay
+        get() = linkRadarFloatingLazy.value
     private val automatePerformer = AutomatePerformer(gestureService)
     private var lastConfig: Configuration = Configuration(context.resources.configuration)
 
@@ -236,12 +258,43 @@ class GestureManager(
         lifecycleScope.launch(Dispatchers.Main) {
             pointerEventBus.collect {
                 if (it.enable || pointerFloatingLazy.isInitialized()) {
+                    pointerFloating.onPointerHidden = {
+                        pointerLinks.stop()
+                        if (linkRadarFloatingLazy.isInitialized()) linkRadarFloating.stopSession()
+                    }
+                    pointerFloating.captureLinks = { pointerLinks.get() }
+                    pointerFloating.onPointerPositionChanged = { snapshot ->
+                        if (linkRadarFloatingLazy.isInitialized()) linkRadarFloating.onPointerPositionChanged(snapshot)
+                    }
+                    pointerFloating.onPointerLinkTargeted = {
+                        linkRadarFloatingLazy.isInitialized() && linkRadarFloating.hasTarget()
+                    }
+                    pointerFloating.onPointerTapInterceptor = {
+                        linkRadarFloatingLazy.isInitialized() &&
+                            linkRadarFloating.onPointerTapRequested()
+                    }
                     pointerFloating.enable = it.enable
                     pointerFloating.needShowTouchView = it.needShowTouchView
                     if (it.enable && it.side != null) {
                         pointerFloating.triggerSide = it.side
                     }
                 }
+                // 链接雷达跟随指针会话，开关位于链接分发设置。
+                if (it.enable) {
+                    pointerLinks.start()
+                    val radarEnabled = context.settingsStore.readKey(
+                        LinkRadarPreferences.KEY_ENABLED,
+                        LinkRadarPreferences.DEFAULT_ENABLED
+                    )
+                    if (radarEnabled && pointerFloating.enable) {
+                        linkRadarFloating.startSession()
+                    } else if (linkRadarFloatingLazy.isInitialized()) {
+                        linkRadarFloating.stopSession()
+                    }
+                } else if (linkRadarFloatingLazy.isInitialized()) {
+                    linkRadarFloating.stopSession()
+                }
+                if (!it.enable) pointerLinks.stop()
             }
         }
         // Notification
@@ -515,6 +568,7 @@ class GestureManager(
         lastConfig = Configuration(newConfig)
 
         if (orientationChanged) {
+            cancelPointerHoverInteraction()
             Log.d(TAG, "Screen orientation changed")
             PictureFloating.onOrientationChanged()
             if (notificationFloatingLazy.isInitialized()) {
@@ -541,10 +595,22 @@ class GestureManager(
         if (screenSearchFloatingLazy.isInitialized()) screenSearchFloating.refreshTheme()
         if (pointerFloatingLazy.isInitialized()) pointerFloating.refreshTheme()
         if (gestureFeedbackFloatingLazy.isInitialized()) gestureFeedbackFloating.refreshTheme()
+        if (linkRadarFloatingLazy.isInitialized()) linkRadarFloating.refreshTheme()
         PictureFloating.refreshAllThemes()
     }
 
     fun onWindowStateChanged(event: AccessibilityEvent) {
+        if (inspireFloatingLazy.isInitialized()) inspireFloating.onWindowEvent(event)
+        if (pointerFloatingLazy.isInitialized()) pointerFloating.onWindowEvent(event)
+        if (pointerLinks.active && (
+                event.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED ||
+                    (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                        event.packageName?.toString() != gestureService.packageName)
+            )) {
+            pointerLinks.invalidate()
+            // Old screen coordinates must not consume a release after the page moves.
+            if (linkRadarFloatingLazy.isInitialized()) linkRadarFloating.stopSession()
+        }
         if (!automatePerformer.isTaskActive()) return
         val trustedWindowContext = CurrentPackageProvider.getTrustedWindowContext(event) ?: return
         val (packageName, className) = trustedWindowContext
@@ -556,6 +622,17 @@ class GestureManager(
         )
     }
 
+    fun onAccessibilityInterrupted() {
+        cancelPointerHoverInteraction()
+        if (inspireFloatingLazy.isInitialized()) inspireFloating.cancelLinkRadar()
+    }
+
+    fun cancelPointerHoverInteraction() {
+        if (pointerFloatingLazy.isInitialized()) pointerFloating.cancelHoverInteraction()
+        pointerLinks.invalidate()
+        if (linkRadarFloatingLazy.isInitialized()) linkRadarFloating.stopSession()
+    }
+
     fun inactiveAllFloating() = lifecycleScope.launch(Dispatchers.Main) {
         Log.d(TAG, "inactiveAllFloating: ")
         freeTriggerFloating.disableAllTrigger()
@@ -564,6 +641,7 @@ class GestureManager(
         if (pointerFloatingLazy.isInitialized()) pointerFloating.hide()
         if (screenSearchFloatingLazy.isInitialized()) screenSearchFloating.hide()
         if (notificationFloatingLazy.isInitialized()) notificationFloating.enable = false
+        if (linkRadarFloatingLazy.isInitialized()) linkRadarFloating.stopSession()
     }
 
     fun activeSomeFloating() = lifecycleScope.launch(Dispatchers.Main) {
@@ -592,6 +670,7 @@ class GestureManager(
     }
 
     fun destroy() {
+        pointerLinks.stop()
         interactionMode = InteractionMode.NORMAL
         freeTriggerFloating.destroy()
         if (guidePreviewFloatingLazy.isInitialized()) guidePreviewFloating.destroy()
@@ -601,6 +680,7 @@ class GestureManager(
         if (pointerFloatingLazy.isInitialized()) pointerFloating.destroy()
         if (notificationFloatingLazy.isInitialized()) notificationFloating.destroy()
         if (screenSearchFloatingLazy.isInitialized()) screenSearchFloating.destroy()
+        if (linkRadarFloatingLazy.isInitialized()) linkRadarFloating.destroy()
         PictureFloating.destroyAll()
         PinPoolFloating.finishIfShowing()
     }

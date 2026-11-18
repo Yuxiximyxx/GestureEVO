@@ -1,13 +1,34 @@
 package io.github.lumiagg.gestureevo.settings
 
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_GLOBAL_PRESS_EARLY_TEXT
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_GLOBAL_PRESS_ENABLED
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_GLOBAL_PRESS_TIMEOUT
+import io.github.lumiagg.gestureevo.drop.DropPreferences.DEFAULT_GLOBAL_PRESS_TIMEOUT_MS
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_GLOBAL_PRESS_ALLOWED
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_EXTERNAL_DROP_ENABLED
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_EXTERNAL_DROP_CONVERSION
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_EXTERNAL_DROP_POSITION
+import io.github.lumiagg.gestureevo.drop.DropPreferences.EXTERNAL_DROP_POSITION_BOTTOM
+import io.github.lumiagg.gestureevo.drop.DropPreferences.EXTERNAL_DROP_POSITION_LEFT
+import io.github.lumiagg.gestureevo.drop.DropPreferences.EXTERNAL_DROP_POSITION_RIGHT
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_EXTERNAL_DROP_SHOW_ENGINES
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_EXTERNAL_DROP_SIDEBAR_MAX_COLUMNS
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_EXTERNAL_DROP_SIDEBAR_MAX_HEIGHT_PERCENT
+import io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_EXTERNAL_DROP_SIDEBAR_FILL_PRIORITY
+import io.github.lumiagg.gestureevo.drop.DropPreferences.EXTERNAL_DROP_FILL_HEIGHT
+import io.github.lumiagg.gestureevo.drop.DropPreferences.EXTERNAL_DROP_FILL_COLUMNS
 import android.content.Intent
+import io.github.lumiagg.gestureevo.utils.app.AShizuku
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import io.github.lumiagg.gestureevo.settings.ui.bindLinkRadarSwitch
+import io.github.lumiagg.gestureevo.drop.PressInputStatus
 import io.github.lumiagg.gestureevo.R
 import io.github.lumiagg.gestureevo.databinding.ActivityInspireSettingsBinding
 import io.github.lumiagg.gestureevo.db.APPModel
@@ -15,7 +36,6 @@ import io.github.lumiagg.gestureevo.gesture.EventBusManager.produceKeyboardEvent
 import io.github.lumiagg.gestureevo.gesture.KeyboardEvent
 import io.github.lumiagg.gestureevo.quick.ui.KeyboardType
 import io.github.lumiagg.gestureevo.settings.ui.BlackListSelectAPPBottomSheet
-import io.github.lumiagg.gestureevo.settings.ui.DefaultLinkOpenManager
 import io.github.lumiagg.gestureevo.settings.ui.DefaultSelectAPPBottomSheet
 import io.github.lumiagg.gestureevo.settings.ui.NotificationDisplayTimeBottomSheet
 import io.github.lumiagg.gestureevo.settings.ui.PointerTouchAreaOffsetBottomSheet
@@ -46,6 +66,7 @@ class InspireSettingsActivity : AppCompatActivity() {
         // Preference keys
         const val KEY_OCR_PRIORITY = "inspire_ocr_priority"
         const val KEY_INSPIRE_DOUBLE_CHECK = "key_inspire_double_check"
+        const val KEY_SCREEN_CONTENT_LINK_RADAR = "key_screen_content_link_radar"
         const val KEY_INSPIRE_SELECTION_VIBRATE = "key_inspire_selection_vibrate"
         const val KEY_INSPIRE_EDGE_BACK = "key_inspire_edge_back"
         const val KEY_INSPIRE_DELAY_REMOVE_IMAGE = "key_inspire_delay_remove_image"
@@ -63,9 +84,11 @@ class InspireSettingsActivity : AppCompatActivity() {
         const val KEY_NOTIFICATION_IMAGE_DISPLAY_SECONDS =
             "key_notification_image_display_seconds"
         const val KEY_SHOW_POINTER_TRAIL = "key_show_pointer_trail"
+
         const val KEY_ALWAYS_SHOW_POINTER_TOUCH_AREA = "key_always_show_pointer_touch_area"
         const val KEY_POINTER_TOUCH_AREA_OFFSET_DP = "key_pointer_touch_area_offset_dp"
         const val KEY_ENABLE_POINTER_DRAG_MODE = "key_enable_pointer_drag_mode"
+        const val KEY_POINTER_HOVER_MENU = "key_pointer_hover_menu"
         const val KEY_PIN_POOL_DISPLAY_MODE = "key_pin_pool_display_mode"
         const val KEY_PIN_POOL_LOCAL_RULE_EXTRACTION = "key_pin_pool_local_rule_extraction"
         const val DEFAULT_PIN_POOL_LOCAL_RULE_EXTRACTION = false
@@ -82,17 +105,6 @@ class InspireSettingsActivity : AppCompatActivity() {
         const val PIN_POOL_DISPLAY_MODE_FOLLOW_TRIGGER = "follow_trigger"
         const val PIN_POOL_DISPLAY_MODE_LEGACY_SIDEBAR = "sidebar"
         const val KEY_DEFAULT_SHARE_BEHAVIOR = "key_default_share_behavior"
-        const val KEY_EXTERNAL_DROP_ENABLED = "key_external_drop_enabled"
-        const val KEY_EXTERNAL_DROP_POSITION = "key_external_drop_position"
-        const val EXTERNAL_DROP_POSITION_BOTTOM = "bottom"
-        const val EXTERNAL_DROP_POSITION_LEFT = "left"
-        const val EXTERNAL_DROP_POSITION_RIGHT = "right"
-        const val KEY_EXTERNAL_DROP_SHOW_ENGINES = "key_external_drop_show_engines"
-        const val KEY_EXTERNAL_DROP_SIDEBAR_MAX_COLUMNS = "key_external_drop_sidebar_max_columns"
-        const val KEY_EXTERNAL_DROP_SIDEBAR_MAX_HEIGHT_PERCENT = "key_external_drop_sidebar_max_height_percent"
-        const val KEY_EXTERNAL_DROP_SIDEBAR_FILL_PRIORITY = "key_external_drop_sidebar_fill_priority"
-        const val EXTERNAL_DROP_FILL_HEIGHT = "height"
-        const val EXTERNAL_DROP_FILL_COLUMNS = "columns"
         const val DEFAULT_NOTIFICATION_IMAGE_DISPLAY_SECONDS = 6
 //        const val KEY_POINTER_ICON_PATH = "key_pointer_icon_PATH"
     }
@@ -104,11 +116,17 @@ class InspireSettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupToolbar()
+        bindLinkRadarSwitch(binding.pointerLinkRadarSwitch)
 
         lifecycleScope.launch {
             initializeViews()
             setupListeners()
             SettingsSearchNavigator.focusAnchorIfNeeded(binding.root, intent)
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                PressInputStatus.message.collect { binding.globalPressStatusText.setText(it) }
+            }
         }
     }
 
@@ -121,6 +139,7 @@ class InspireSettingsActivity : AppCompatActivity() {
     }
 
     private suspend fun initializeViews() {
+        io.github.lumiagg.gestureevo.drop.DropPreferences.ensureGlobalPressWhitelist(this)
         // Initialize OCR-priority switch state
         val ocrPriority = settingsStore.readKey(KEY_OCR_PRIORITY, true)
         binding.ocrPrioritySwitch.isChecked = ocrPriority
@@ -145,7 +164,16 @@ class InspireSettingsActivity : AppCompatActivity() {
         // Default share behavior
         val defaultShareBehavior = settingsStore.readKey(KEY_DEFAULT_SHARE_BEHAVIOR, "tokenization")
         updateDefaultShareBehaviorText(defaultShareBehavior)
+        binding.globalPressEarlyTextSwitch.isChecked = settingsStore.readKey(KEY_GLOBAL_PRESS_EARLY_TEXT, false)
+        binding.globalPressImmediateSwitch.isChecked = settingsStore.readKey(io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_GLOBAL_PRESS_IMMEDIATE, false)
+        binding.globalPressSwitch.isChecked = settingsStore.readKey(KEY_GLOBAL_PRESS_ENABLED, false)
+        updateGlobalPressSettingsEnabled()
+        binding.selectedGlobalPressTimeoutText.text = getString(
+            R.string.global_press_milliseconds, settingsStore.readKey(KEY_GLOBAL_PRESS_TIMEOUT, DEFAULT_GLOBAL_PRESS_TIMEOUT_MS)
+        )
+        updateGlobalPressAllowedText(settingsStore.readKey(KEY_GLOBAL_PRESS_ALLOWED, "").split('|'))
         binding.externalDropSwitch.isChecked = settingsStore.readKey(KEY_EXTERNAL_DROP_ENABLED, true)
+        binding.externalDropConversionSwitch.isChecked = settingsStore.readKey(KEY_EXTERNAL_DROP_CONVERSION, false)
         binding.externalDropEnginesSwitch.isChecked = settingsStore.readKey(KEY_EXTERNAL_DROP_SHOW_ENGINES, true)
         updateExternalDropPositionText(
             settingsStore.readKey(KEY_EXTERNAL_DROP_POSITION, EXTERNAL_DROP_POSITION_BOTTOM)
@@ -170,6 +198,8 @@ class InspireSettingsActivity : AppCompatActivity() {
             )
         )
 
+        binding.screenContentLinkRadarSwitch.isChecked = settingsStore.readKey(KEY_SCREEN_CONTENT_LINK_RADAR, false)
+
         // Pointer trail
         binding.pointerTrailSwitch.isChecked =
             settingsStore.readKey(KEY_SHOW_POINTER_TRAIL, false)
@@ -180,6 +210,8 @@ class InspireSettingsActivity : AppCompatActivity() {
 
         binding.pointerDragModeSwitch.isChecked =
             settingsStore.readKey(KEY_ENABLE_POINTER_DRAG_MODE, false)
+        binding.pointerHoverMenuSwitch.isChecked = settingsStore.readKey(KEY_POINTER_HOVER_MENU, false)
+        updatePointerHoverMenuSetting(binding.pointerHoverMenuSwitch.isChecked)
 
         val pinPoolDisplayMode =
             settingsStore.readKey(KEY_PIN_POOL_DISPLAY_MODE, PIN_POOL_DISPLAY_MODE_RIGHT_SIDEBAR)
@@ -243,14 +275,6 @@ class InspireSettingsActivity : AppCompatActivity() {
         } else {
             updateSearchSelectionText(searchLink)
         }
-
-        binding.linkOpenRow.setOnClickListener {
-            lifecycleScope.launch {
-                val linkOpenManager =
-                    DefaultLinkOpenManager(this@InspireSettingsActivity, lifecycleScope)
-                linkOpenManager.showDefaultLinkOpenSettings()
-            }
-        }
     }
 
     private fun setupListeners() {
@@ -312,9 +336,65 @@ class InspireSettingsActivity : AppCompatActivity() {
             showDefaultShareBehaviorDialog()
         }
 
+        binding.globalPressSwitch.setOnCheckedChangeListener { _, enabled ->
+            updateGlobalPressSettingsEnabled()
+            lifecycleScope.launch {
+                if (enabled && !AShizuku.checkPermission(this@InspireSettingsActivity)) {
+                    binding.globalPressSwitch.isChecked = false
+                    return@launch
+                }
+                if (enabled != binding.globalPressSwitch.isChecked) return@launch
+                settingsStore.saveKey(KEY_GLOBAL_PRESS_ENABLED, enabled)
+                if (enabled) {
+                    MaterialAlertDialogBuilder(this@InspireSettingsActivity)
+                        .setMessage(R.string.global_press_permission_required)
+                        .setPositiveButton(android.R.string.ok, null).show()
+                }
+            }
+        }
+        binding.globalPressEarlyTextSwitch.setOnCheckedChangeListener { _, enabled ->
+            lifecycleScope.launch { settingsStore.saveKey(KEY_GLOBAL_PRESS_EARLY_TEXT, enabled) }
+        }
+        binding.globalPressImmediateSwitch.setOnCheckedChangeListener { _, enabled ->
+            lifecycleScope.launch { settingsStore.saveKey(io.github.lumiagg.gestureevo.drop.DropPreferences.KEY_GLOBAL_PRESS_IMMEDIATE, enabled) }
+        }
+        binding.globalPressTimeoutRow.setOnClickListener {
+            lifecycleScope.launch {
+                val values = intArrayOf(300, 500, 700, 1000, 1500, 2000)
+                val current = settingsStore.readKey(KEY_GLOBAL_PRESS_TIMEOUT, DEFAULT_GLOBAL_PRESS_TIMEOUT_MS)
+                MaterialAlertDialogBuilder(this@InspireSettingsActivity)
+                    .setTitle(R.string.global_press_timeout)
+                    .setSingleChoiceItems(values.map { getString(R.string.global_press_milliseconds, it) }.toTypedArray(), values.indexOf(current)) { dialog, which ->
+                        lifecycleScope.launch {
+                            settingsStore.saveKey(KEY_GLOBAL_PRESS_TIMEOUT, values[which])
+                            binding.selectedGlobalPressTimeoutText.text = getString(R.string.global_press_milliseconds, values[which])
+                        }
+                        dialog.dismiss()
+                    }.show()
+            }
+        }
+        binding.globalPressAllowedRow.setOnClickListener {
+            lifecycleScope.launch {
+                val packages = settingsStore.readKey(KEY_GLOBAL_PRESS_ALLOWED, "").split('|').filter(String::isNotBlank).toMutableList()
+                io.github.lumiagg.gestureevo.settings.ui.BlackListWithNoDBSelectAPPBottomSheet(
+                    this@InspireSettingsActivity, lifecycleScope,
+                    object : io.github.lumiagg.gestureevo.settings.ui.BlackListWithNoDBSelectAPPBottomSheet.BlackListSelectAPPCallBack {
+                        override fun selectCompleted(blackList: List<String>) {
+                            lifecycleScope.launch {
+                                settingsStore.saveKey(KEY_GLOBAL_PRESS_ALLOWED, blackList.joinToString("|"))
+                                updateGlobalPressAllowedText(blackList)
+                            }
+                        }
+                    }, packages, whitelist = true,
+                ).show()
+            }
+        }
         binding.externalDropSwitch.setOnCheckedChangeListener { _, isChecked ->
             updateExternalDropSettingsEnabled()
             lifecycleScope.launch { settingsStore.saveKey(KEY_EXTERNAL_DROP_ENABLED, isChecked) }
+        }
+        binding.externalDropConversionSwitch.setOnCheckedChangeListener { _, isChecked ->
+            lifecycleScope.launch { settingsStore.saveKey(KEY_EXTERNAL_DROP_CONVERSION, isChecked) }
         }
         binding.externalDropPositionRow.setOnClickListener {
             showExternalDropPositionDialog()
@@ -345,11 +425,7 @@ class InspireSettingsActivity : AppCompatActivity() {
                 object : SelectAPPCallBack {
                     override fun selectCompleted(model: APPModel) {}
                 },
-                blackListFlag = APPModel.FLAG_NOTIFICATION_APPS_ENABLE,
-                disableIcon = ContextCompat.getDrawable(
-                    applicationContext,
-                    R.drawable.baseline_check_24
-                )
+                blackListFlag = APPModel.FLAG_NOTIFICATION_APPS_ENABLE
             ).show()
         }
 
@@ -445,6 +521,15 @@ class InspireSettingsActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 settingsStore.saveKey(KEY_ENABLE_POINTER_DRAG_MODE, isChecked)
             }
+        }
+
+        binding.screenContentLinkRadarSwitch.setOnCheckedChangeListener { _, isChecked ->
+            lifecycleScope.launch { settingsStore.saveKey(KEY_SCREEN_CONTENT_LINK_RADAR, isChecked) }
+        }
+
+        binding.pointerHoverMenuSwitch.setOnCheckedChangeListener { _, isChecked ->
+            updatePointerHoverMenuSetting(isChecked)
+            lifecycleScope.launch { settingsStore.saveKey(KEY_POINTER_HOVER_MENU, isChecked) }
         }
 
         binding.pinPoolModeRow.setOnClickListener {
@@ -597,6 +682,15 @@ class InspireSettingsActivity : AppCompatActivity() {
         textView.text = value
     }
 
+    private fun updateGlobalPressAllowedText(packages: List<String>) {
+        val count = packages.filter(String::isNotBlank).distinct().size
+        binding.selectedGlobalPressAllowedText.text = if (count == 0) {
+            getString(R.string.global_press_allowed_none)
+        } else {
+            resources.getQuantityString(R.plurals.global_press_allowed_count, count, count)
+        }
+    }
+
     private fun updateDefaultShareBehaviorText(value: String) {
         binding.selectedDefaultShareBehaviorText.text = when (value) {
             "pinpool" -> getString(R.string.inspire_settings_share_to_pinpool)
@@ -604,7 +698,25 @@ class InspireSettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateGlobalPressSettingsEnabled() {
+        val enabled = binding.globalPressSwitch.isChecked
+        listOf(
+            binding.globalPressEarlyTextRow,
+            binding.globalPressEarlyTextSwitch,
+            binding.globalPressImmediateRow,
+            binding.globalPressImmediateSwitch,
+            binding.globalPressTimeoutRow,
+            binding.globalPressAllowedRow
+        ).forEach { row ->
+            row.isEnabled = enabled
+            row.alpha = if (enabled) 1f else 0.5f
+        }
+    }
+
     private fun updateExternalDropSettingsEnabled() {
+        binding.externalDropConversionRow.isEnabled = binding.externalDropSwitch.isChecked
+        binding.externalDropConversionSwitch.isEnabled = binding.externalDropSwitch.isChecked
+        binding.externalDropConversionRow.alpha = if (binding.externalDropSwitch.isChecked) 1f else 0.5f
         val enabled = binding.externalDropSwitch.isChecked || binding.externalDropEnginesSwitch.isChecked
         binding.externalDropPositionRow.isEnabled = enabled
         binding.externalDropPositionRow.alpha = if (enabled) 1f else 0.5f
@@ -905,6 +1017,13 @@ class InspireSettingsActivity : AppCompatActivity() {
                 }
             }.show()
         }
+    }
+
+    private fun updatePointerHoverMenuSetting(enabled: Boolean) {
+        binding.pointerDragModeSwitch.isEnabled = !enabled
+        binding.pointerDragModeRow.isEnabled = !enabled
+        binding.pointerDragModeRow.alpha = if (enabled) 0.5f else 1f
+        binding.pointerHoverMenuHint.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
     private fun updatePointerTouchAreaOffsetText(offsetDp: Int) {

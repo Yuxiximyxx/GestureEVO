@@ -1,0 +1,170 @@
+package io.github.lumiagg.gestureevo.settings.ui
+
+import android.app.Activity
+import android.view.LayoutInflater
+import android.view.View
+import io.github.lumiagg.gestureevo.utils.ToastHelper
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.drake.brv.utils.models
+import com.drake.brv.utils.setup
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.textview.MaterialTextView
+import io.github.lumiagg.gestureevo.R
+import io.github.lumiagg.gestureevo.databinding.BottomSheetLinkExtractsBinding
+import io.github.lumiagg.gestureevo.link.LinkExtractPattern
+import io.github.lumiagg.gestureevo.link.LinkRuleRepository
+import io.github.lumiagg.gestureevo.utils.DynamicColorUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+/**
+ * Manages the regexes used to find a link inside arbitrary text.
+ *
+ * Built-in patterns can be disabled but not deleted, because the fallback detector covers
+ * common URLs and users would otherwise be able to remove every way of finding a link.
+ */
+class LinkExtractsBottomSheet(
+    private val activity: Activity,
+    private val coroutineScope: LifecycleCoroutineScope
+) {
+
+    private lateinit var dialog: BottomSheetDialog
+    private lateinit var binding: BottomSheetLinkExtractsBinding
+    private val patterns = mutableListOf<LinkExtractPattern>()
+
+    fun show() {
+        val themedContext = DynamicColorUtils.dynamicThemedContext(activity)
+        dialog = BottomSheetDialog(themedContext, R.style.ThemeOverlay_BottomSheetDialog_Scrollable)
+        binding = BottomSheetLinkExtractsBinding.inflate(LayoutInflater.from(themedContext))
+        dialog.setContentView(binding.root)
+        dialog.prepareLinkSettingsSheet(binding.root)
+
+        binding.title.text = activity.getString(R.string.link_extract_title)
+        binding.description.text = activity.getString(R.string.link_extract_description)
+        binding.addButton.setOnClickListener { showEditor(null) }
+        setupRecyclerView()
+        dialog.show()
+        reload()
+    }
+
+    private fun setupRecyclerView() {
+        binding.recyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.recyclerView.setup {
+            addType<LinkExtractPattern>(R.layout.item_link_extract)
+            onBind {
+                val pattern = getModel<LinkExtractPattern>()
+                val label = if (pattern.isBuiltin) {
+                    "${pattern.name} · ${activity.getString(R.string.link_extract_builtin)}"
+                } else {
+                    pattern.name
+                }
+                findView<MaterialTextView>(R.id.nameText).text = label
+                findView<MaterialTextView>(R.id.patternText).text = pattern.pattern
+
+                findView<MaterialSwitch>(R.id.enabledSwitch).apply {
+                    setOnCheckedChangeListener(null)
+                    isChecked = pattern.isEnabled
+                    setOnCheckedChangeListener { _, checked ->
+                        persist(pattern.copy(isEnabled = checked))
+                    }
+                }
+
+                findView<MaterialButton>(R.id.deleteButton).apply {
+                    isEnabled = !pattern.isBuiltin
+                    visibility = if (pattern.isBuiltin) View.INVISIBLE else View.VISIBLE
+                    setOnClickListener {
+                        if (pattern.isBuiltin) {
+                            ToastHelper.showInUIThread(activity, R.string.link_extract_builtin_locked)
+                        } else {
+                            confirmDelete(pattern)
+                        }
+                    }
+                }
+
+                itemView.setOnClickListener { showEditor(pattern) }
+            }
+        }
+    }
+
+    private fun reload() {
+        coroutineScope.launch {
+            val loaded = withContext(Dispatchers.IO) {
+                LinkRuleRepository.loadExtractPatterns(activity)
+            }
+            patterns.clear()
+            patterns.addAll(loaded)
+            binding.recyclerView.models = patterns.toList()
+            binding.emptyView.visibility = if (patterns.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun showEditor(original: LinkExtractPattern?) {
+        val themedContext = DynamicColorUtils.dynamicThemedContext(activity)
+        val form = LinkSettingsForm(themedContext)
+        val nameField = form.field(R.string.link_extract_name_hint, original?.name.orEmpty())
+        val patternField = form.field(R.string.link_extract_pattern_hint, original?.pattern.orEmpty(), multiline = true)
+        val editor = MaterialAlertDialogBuilder(themedContext)
+            .setTitle(if (original == null) R.string.link_extract_add else R.string.link_extract_title)
+            .setView(form)
+            .setPositiveButton(R.string.link_rule_save, null)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        editor.setOnShowListener {
+            editor.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                val name = nameField.editText?.text?.toString()?.trim().orEmpty()
+                val pattern = patternField.editText?.text?.toString()?.trim().orEmpty()
+                val error = when {
+                    pattern.isEmpty() -> R.string.link_rule_pattern_required
+                    runCatching { Regex(pattern) }.isFailure -> R.string.link_extract_invalid
+                    else -> null
+                }
+                patternField.error = error?.let(activity::getString)
+                if (error != null) {
+                    patternField.editText?.requestFocus()
+                    return@setOnClickListener
+                }
+                persist((original ?: LinkExtractPattern()).copy(
+                    name = name.ifEmpty { pattern.take(24) }, pattern = pattern
+                ))
+                editor.dismiss()
+            }
+        }
+        editor.show()
+    }
+
+    private fun persist(pattern: LinkExtractPattern) {
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                LinkRuleRepository.updateExtractPatterns(activity) { stored ->
+                    val current = stored.toMutableList()
+                    val index = current.indexOfFirst { it.id == pattern.id }
+                    if (index >= 0) current[index] = pattern else current.add(pattern)
+                    current
+                }
+            }
+            reload()
+        }
+    }
+
+    private fun confirmDelete(pattern: LinkExtractPattern) {
+        MaterialAlertDialogBuilder(activity)
+            .setTitle(R.string.link_extract_title)
+            .setMessage(pattern.name)
+            .setPositiveButton(R.string.link_open_action_delete) { _, _ ->
+                coroutineScope.launch {
+                    withContext(Dispatchers.IO) {
+                        LinkRuleRepository.updateExtractPatterns(activity) { it.filterNot { current -> current.id == pattern.id } }
+                    }
+                    reload()
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+}

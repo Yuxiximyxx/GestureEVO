@@ -288,6 +288,30 @@ object SettingsSearchRegistry {
             keywords = listOf("屏幕内容卡片背景模糊", "取词卡片模糊", "screen content card blur")
         ),
         entry(
+            id = "appearance_external_drop_blur",
+            titleResId = R.string.appearance_settings_external_drop_background_blur,
+            pageTitleResId = R.string.appearance_settings_title,
+            targetActivity = AppearanceSettingsActivity::class.java,
+            targetViewId = R.id.externalDropAppearanceCard,
+            keywords = listOf("拖放悬浮窗背景模糊", "拖放背景模糊", "drag blur")
+        ),
+        entry(
+            id = "appearance_external_drop_system_drag_blur",
+            titleResId = R.string.appearance_settings_external_drop_system_drag_blur,
+            pageTitleResId = R.string.appearance_settings_title,
+            targetActivity = AppearanceSettingsActivity::class.java,
+            targetViewId = R.id.externalDropAppearanceCard,
+            keywords = listOf("系统拖拽背景模糊", "拖放系统拖拽模糊", "system drag blur")
+        ),
+        entry(
+            id = "appearance_external_drop_card_blur",
+            titleResId = R.string.appearance_settings_external_drop_card_background_blur,
+            pageTitleResId = R.string.appearance_settings_title,
+            targetActivity = AppearanceSettingsActivity::class.java,
+            targetViewId = R.id.externalDropAppearanceCard,
+            keywords = listOf("拖放卡片背景模糊", "拖放卡片模糊", "drag card blur")
+        ),
+        entry(
             id = "appearance_fluid_feedback",
             titleResId = R.string.appearance_settings_fluid_title,
             pageTitleResId = R.string.appearance_settings_title,
@@ -670,6 +694,14 @@ object SettingsSearchRegistry {
             keywords = listOf("强复制", "自动复制", "剪切板", "clipboard", "copy")
         ),
         entry(
+            id = "inspire_share_and_drop",
+            titleResId = R.string.inspire_settings_share_settings_title,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.defaultShareBehaviorCard,
+            keywords = listOf("分享设置", "外部拖放设置", "分享与拖放", "拖拽", "sharing", "drag and drop")
+        ),
+        entry(
             id = "inspire_share_behavior",
             titleResId = R.string.inspire_settings_default_share_behavior_title,
             pageTitleResId = R.string.inspire_settings_title,
@@ -684,6 +716,22 @@ object SettingsSearchRegistry {
             targetActivity = InspireSettingsActivity::class.java,
             targetViewId = R.id.defaultShareBehaviorCard,
             keywords = listOf("外部拖放", "拖拽", "工具按钮", "Pin池", "Pin图", "分词", "悬浮窗", "drop", "drag", "tool buttons", "tokenize")
+        ),
+        entry(
+            id = "global_press_drag",
+            titleResId = R.string.global_press_title,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.globalPressCard,
+            keywords = listOf("全局长按拖放", "文字", "图片", "Shizuku", "长按时间", "提前读取", "长按菜单", "early text", "白名单", "允许应用", "global long press drag drop", "duration", "allowlist", "allowed apps")
+        ),
+        entry(
+            id = "inspire_external_drop_conversion",
+            titleResId = R.string.external_drop_conversion_title,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.defaultShareBehaviorCard,
+            keywords = listOf("拖拽", "图文转换", "文字转图片", "图片转文字", "OCR", "drag", "convert", "text", "image")
         ),
         entry(
             id = "inspire_external_drop_position",
@@ -797,6 +845,33 @@ object SettingsSearchRegistry {
             targetActivity = InspireSettingsActivity::class.java,
             targetViewId = R.id.PointerCard,
             keywords = listOf("拖拽模式", "pointer drag")
+        ),
+        entry(
+            id = "screen_content_link_radar",
+            titleResId = R.string.screen_content_link_radar_title,
+            summaryResId = R.string.screen_content_link_radar_summary,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.screen_content_link_radar_row,
+            keywords = listOf("屏幕内容", "链接雷达", "链接高亮", "screen content", "link radar")
+        ),
+        entry(
+            id = "pointer_hover_menu",
+            titleResId = R.string.pointer_hover_menu_title,
+            summaryResId = R.string.pointer_hover_menu_summary,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.pointer_hover_menu_row,
+            keywords = listOf("指针", "悬停", "菜单", "长按", "双击", "框选", "链接", "pointer hover menu")
+        ),
+        entry(
+            id = "pointer_link_radar",
+            titleResId = R.string.inspire_settings_link_radar_title,
+            summaryResId = R.string.inspire_settings_link_radar_desc,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.pointer_link_radar_row,
+            keywords = listOf("指针", "链接雷达", "链接高亮", "pointer", "link radar")
         ),
         entry(
             id = "inspire_pin_pool_mode",
